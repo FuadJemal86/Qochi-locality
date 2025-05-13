@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const adminRoute = require('./Router/adminRoute')
+const userRoute = require('./Router/userRoute')
 
 
 
@@ -20,6 +21,7 @@ app.use(cors({
 
 
 app.use('/admin', adminRoute)
+app.use('/user', userRoute)
 
 
 

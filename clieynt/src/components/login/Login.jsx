@@ -30,7 +30,7 @@ function Login() {
 
         try {
             // Using the role to determine the endpoint
-            const endpoint = role === "admin" ? '/admin/login' : '/family-head/login'
+            const endpoint = role === "admin" ? '/admin/login' : '/user/login'
             const result = await api.post(endpoint, {
                 email,
                 password
