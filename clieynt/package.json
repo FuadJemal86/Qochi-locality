@@ -10,8 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-toast": "^1.2.13",
+    "@shadcn/ui": "^0.0.4",
     "@tailwindcss/vite": "^4.1.6",
+    "autoprefixer": "^10.4.21",
     "axios": "^1.9.0",
+    "lucide-react": "^0.510.0",
+    "postcss": "^8.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.5.2",

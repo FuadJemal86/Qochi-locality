@@ -38,7 +38,7 @@ function Login() {
 
             if (result.data.loginStatus) {
                 // Navigate to appropriate dashboard based on role
-                navigate(role === "admin" ? '/admin-page' : '/family-head-dashboard')
+                navigate(role === "admin" ? '/admin-dashboard' : '/family-head-dashboard')
             } else {
                 toast.error(result.data.message || 'Login failed!')
             }
