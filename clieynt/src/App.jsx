@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css'
 import Login from './components/login/Login';
 import AdminNav from './components/admin/adminNav/AdminNav';
+import FamilyHeaders from './components/admin/adminNav/FamilyHeaders';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -14,6 +15,8 @@ function App() {
         <Route path='/' element={<Login />} />
 
         <Route path="/admin-dashboard" element={<AdminNav />}>
+          <Route path='family-headers' element={<FamilyHeaders />} />
+
 
         </Route>
       </Routes>

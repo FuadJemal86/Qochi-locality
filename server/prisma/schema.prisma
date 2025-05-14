@@ -60,7 +60,7 @@ model Member {
   fullName            String
   birthDate           DateTime
   type                MemberType
-  relationship        String
+  relationship        String?
   education           String?
   occupation          String?
   status              MemberStatus @default(ACTIVE)
