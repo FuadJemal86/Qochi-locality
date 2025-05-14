@@ -113,7 +113,7 @@ export default function AdminNav() {
     };
 
     return (
-        <div className="flex h-screen bg-gray-100">
+        <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
             {/* Sidebar */}
             <div className={`bg-gray-900 shadow-lg z-20 fixed inset-y-0 left-0 transition-all duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
                 } ${isMobile ? 'w-64' : sidebarOpen ? 'w-64' : 'w-20'}`}>
@@ -233,7 +233,7 @@ export default function AdminNav() {
             {/* Main Content */}
             <div className={`flex-1 flex flex-col ${isMobile ? '0' : (sidebarOpen ? 'md:ml-64' : 'md:ml-20')} transition-all duration-300`}>
                 {/* Header */}
-                <header className="bg-white shadow-sm h-16 flex items-center z-10">
+                <header className="bg-white shadow-sm h-16 flex items-center z-10 sticky top-0">
                     <div className="flex items-center justify-between w-full px-6">
                         <div className="flex items-center">
                             {isMobile && (

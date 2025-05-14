@@ -12,13 +12,14 @@ const storage = multer.diskStorage({
         cb(null, filename);
     }
 });
+
 const upload = multer({ storage: storage });
 
 const addFamilyHead = [upload.single('image'), async (req, res) => {
     try {
-        const { fullName, contactInfo, email, password } = req.body;
+        const { fullName, contactInfo, email, password, houseNumber, familysize } = req.body;
 
-        if (!fullName || !contactInfo || !email || !password) {
+        if (!fullName || !contactInfo || !email || !password || !houseNumber || !familysize) {
             return res.status(400).json({ status: false, message: 'Please fill all required fields' });
         }
 
@@ -37,13 +38,13 @@ const addFamilyHead = [upload.single('image'), async (req, res) => {
                 contactInfo,
                 email,
                 password: hashedPassword,
+                houseNumber,
+                familysize,
                 image: req.file ? req.file.filename : null
             }
         });
 
-
-
-        res.status(201).json({ status: true, message: 'Family Head account created successfully' });
+        res.status(201).json({ status: true, message: 'Family Head account created successfully', data: familyHead });
     } catch (err) {
         console.error('Error creating Family Head account:', err.message);
         res.status(500).json({ status: false, message: 'Internal server error' });
