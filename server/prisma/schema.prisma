@@ -29,15 +29,30 @@ model Family {
 }
 
 model FamilyHead {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   fullName    String
   contactInfo String
-  email       String   @unique
+  email       String      @unique
   password    String
   image       String?
+  houseNumber String
+  familysize  String
   family      Family?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isRemoved   Boolean     @default(false)
+  idRequests  IDRequest[] // Add this line for the reverse relation
+  payments    Payment[] // Link to payments
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model LocalityAccount {
+  id            Int       @id @default(autoincrement())
+  branch        String
+  accountNumber String    @unique
+  balance       Float     @default(0.0)
+  payments      Payment[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Member {
@@ -53,10 +68,40 @@ model Member {
   image               String?
   deathCertificate    String?
   marriageCertificate String?
+  isRemoved           Boolean      @default(false)
+  isApproved          Boolean      @default(false)
   familyId            Int
   family              Family       @relation(fields: [familyId], references: [id])
+  idExpiryDate        DateTime?
+  idRestored          Boolean      @default(false)
+  restorationDate     DateTime?
+  restorationPayment  Float?
+  idRequests          IDRequest[] // Add this line for the reverse relation
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
+}
+
+model IDRequest {
+  id           Int           @id @default(autoincrement())
+  familyHeadId Int
+  memberId     Int
+  status       RequestStatus @default(PENDING)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  familyHead   FamilyHead    @relation(fields: [familyHeadId], references: [id])
+  member       Member        @relation(fields: [memberId], references: [id])
+}
+
+model Payment {
+  id                Int             @id @default(autoincrement())
+  familyHeadId      Int
+  localityAccountId Int
+  amount            Float
+  transactionDate   DateTime        @default(now())
+  familyHead        FamilyHead      @relation(fields: [familyHeadId], references: [id])
+  localityAccount   LocalityAccount @relation(fields: [localityAccountId], references: [id])
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 }
 
 enum MemberType {
@@ -69,4 +114,10 @@ enum MemberStatus {
   MARRIED
   DECEASED
   LEFT_LOCALITY
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

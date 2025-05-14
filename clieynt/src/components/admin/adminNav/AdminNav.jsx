@@ -82,6 +82,13 @@ export default function AdminNav() {
                             </a>
                         </li>
 
+                        <li>
+                            <a href="#" className="flex items-center px-4 py-2 text-white hover:bg-gray-800 rounded-md">
+                                <Home className="h-5 w-5" />
+                                {sidebarOpen && <span className="ml-3">Family Headers</span>}
+                            </a>
+                        </li>
+
                         {/* Users Section */}
                         <li>
                             <button
@@ -90,7 +97,7 @@ export default function AdminNav() {
                             >
                                 <div className="flex items-center">
                                     <Users className="h-5 w-5" />
-                                    {sidebarOpen && <span className="ml-3">Users</span>}
+                                    {sidebarOpen && <span className="ml-3">Memmbers</span>}
                                 </div>
                                 {sidebarOpen && <ChevronDown className={`h-4 w-4 ${activeDropdown === 'users' ? 'transform rotate-180' : ''}`} />}
                             </button>
@@ -99,20 +106,14 @@ export default function AdminNav() {
                                 <ul className="mt-1 pl-6 space-y-1">
                                     <li>
                                         <a href="#" className="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-800 rounded-md">
-                                            <UserCheck className="h-4 w-4" />
-                                            <span className="ml-3">Active Users</span>
+                                            <UserX className="h-4 w-4" />
+                                            <span className="ml-3">Rejected Memmbers</span>
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#" className="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-800 rounded-md">
                                             <UserX className="h-4 w-4" />
-                                            <span className="ml-3">Rejected Users</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" className="flex items-center px-4 py-2 text-sm text-white hover:bg-gray-800 rounded-md">
-                                            <UserX className="h-4 w-4" />
-                                            <span className="ml-3">Removed Users</span>
+                                            <span className="ml-3">Removed Memmbers</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -127,7 +128,7 @@ export default function AdminNav() {
                             >
                                 <div className="flex items-center">
                                     <UserPlus className="h-5 w-5" />
-                                    {sidebarOpen && <span className="ml-3">Add user</span>}
+                                    {sidebarOpen && <span className="ml-3">Id</span>}
                                 </div>
                             </button>
                         </li>
