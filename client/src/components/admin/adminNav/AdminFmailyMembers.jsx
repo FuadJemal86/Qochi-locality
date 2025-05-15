@@ -4,15 +4,29 @@ import { Edit, Trash, Info, UserPlus, X, Search, ChevronLeft, ChevronRight, Prin
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../../../../api';
+import toast from 'react-hot-toast';
 
-function FmailyMembers() {
+function AdminFmailyMembers() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [selectedFamilyId, setSelectedFamilyId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [familyHeadsData, setFamilyHeadsData] = useState([]);
     const [familyMembersData, setFamilyMembersData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
+    const [statusState, setStatusState] = useState({
+        status: ''
+    })
     const itemsPerPage = 5;
+
+    const getStatusBadgeColor = (status) => {
+        const statusColors = {
+            APPROVED: "bg-green-100 text-green-800",
+            PENDING: "bg-yellow-100 text-yellow-800",
+            REJECTED: "bg-red-100 text-red-800",
+        };
+
+        return statusColors[status] || "bg-gray-100 text-gray-800";
+    };
 
     // Filter data based on search term
     const filteredData = familyHeadsData.filter(family =>
@@ -69,20 +83,21 @@ function FmailyMembers() {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const result = await api.get('/user/get-members');
-                if (result.data.status) {
-                    setFamilyHeadsData(result.data.familyMembers);
-                } else {
-                    console.log(result.data.message);
-                }
-            } catch (err) {
-                console.error('Error fetching family headers:', err);
-            }
-        };
         fetchData();
     }, []);
+
+    const fetchData = async () => {
+        try {
+            const result = await api.get('/admin/get-members');
+            if (result.data.status) {
+                setFamilyHeadsData(result.data.familyMembers);
+            } else {
+                console.log(result.data.message);
+            }
+        } catch (err) {
+            console.error('Error fetching family headers:', err);
+        }
+    };
 
     // print the customer table
     const handlePrint = () => {
@@ -119,6 +134,27 @@ function FmailyMembers() {
         saveAs(data, "Families.xlsx");
     };
 
+
+
+    const handleApproval = async (value, id) => {
+        try {
+            const result = await api.put(`/admin/member-approval/${id}`, {
+                ...statusState,
+                status: value
+            })
+
+            if (result.data.status) {
+                toast.success(result.data.message)
+                fetchData()
+            } else {
+                console.log(result.data.message)
+            }
+
+        } catch (err) {
+            console.log(err)
+        }
+
+    }
     return (
         <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
             <div className="bg-white rounded-xl shadow-lg p-4 md:p-6 border border-gray-100">
@@ -150,16 +186,6 @@ function FmailyMembers() {
                             />
                             <Search size={18} className="absolute left-3 top-2.5 text-gray-400" />
                         </div>
-
-                        <button
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md flex items-center gap-2 transition-colors duration-200"
-                        >
-                            <Link className='flex items-center gap-1' to={'/family-head-dashboard/add-family-members'}>
-                                <UserPlus size={18} />
-
-                                Add Members
-                            </Link>
-                        </button>
                     </div>
                 </div>
 
@@ -171,6 +197,7 @@ function FmailyMembers() {
                                 <tr>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Header Name</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birth Date</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relation</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
@@ -180,70 +207,93 @@ function FmailyMembers() {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {currentItems.length > 0 ? (
-                                    currentItems.map((family) => (
-                                        <tr key={family.id} className="hover:bg-gray-50 transition-colors duration-150">
-                                            <td className="py-4 px-4 whitespace-nowrap">{family.id}</td>
-                                            <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{family.fullName}</td>
-                                            <td className="p-3 text-sm text-gray-500">
-                                                {new Date(family.birthDate).toLocaleDateString('en-GB', {
-                                                    day: 'numeric',
-                                                    month: 'long',
-                                                    year: 'numeric'
-                                                }).replace(' ', '.')}
-                                            </td>
-                                            <td className="py-4 px-4 whitespace-nowrap text-gray-700">{family.relationship}</td>
-                                            <td className="p-3 text-sm text-gray-500">
-                                                {new Date(family.createdAt).toLocaleDateString('en-GB', {
-                                                    day: 'numeric',
-                                                    month: 'long',
-                                                    year: 'numeric'
-                                                }).replace(' ', '.')}
-                                            </td>
-                                            {
-                                                family.isApproved === false ? (
-                                                    <td className="py-4 px-5  whitespace-nowrap text-gray-700 ">
-                                                        <span className='bg-red-100 rounded-2xl px-2 text-red-800'>Pending</span>
-                                                    </td>
-                                                ) : (
-                                                    <td className="py-4 px-4 whitespace-nowrap text-gray-700">
-                                                        <span className='bg-green-100 rounded-2xl px-2 text-green-800'>Approved</span>
-                                                    </td>
-                                                )
-                                            }
-                                            <td className="py-4 px-4 whitespace-nowrap">
-                                                <div className="flex space-x-2">
-                                                    <button
-                                                        onClick={() => handleViewDetails(family.id)}
-                                                        className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
-                                                        title="View Details"
+                                    currentItems.map((family) =>
+                                        family.members.map((member) => (
+                                            <tr key={`${family.id}-${member.id}`} className="hover:bg-gray-50 transition-colors duration-150">
+                                                {/* Family ID */}
+                                                <td className="py-4 px-4 whitespace-nowrap">{family.id}</td>
+
+                                                {/* Family Head Name */}
+                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{family.fullName || "No Family Name"}</td>
+
+                                                {/* Member Name */}
+                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.fullName || "No Member Name"}</td>
+
+                                                {/* Member Birth Date */}
+                                                <td className="p-3 text-sm text-gray-500">
+                                                    {member.birthDate
+                                                        ? new Date(member.birthDate).toLocaleDateString("en-GB", {
+                                                            day: "numeric",
+                                                            month: "long",
+                                                            year: "numeric",
+                                                        }).replace(/ /g, ".")
+                                                        : "No Birth Date"}
+                                                </td>
+
+                                                {/* Relationship */}
+                                                <td className="py-4 px-4 whitespace-nowrap text-gray-700">{member.relationship || "No Relationship"}</td>
+
+                                                {/* Member Created At */}
+                                                <td className="p-3 text-sm text-gray-500">
+                                                    {member.createdAt
+                                                        ? new Date(member.createdAt).toLocaleDateString("en-GB", {
+                                                            day: "numeric",
+                                                            month: "long",
+                                                            year: "numeric",
+                                                        }).replace(/ /g, ".")
+                                                        : "No Created Date"}
+                                                </td>
+
+                                                {/* Approval Status */}
+                                                <td>
+                                                    <select
+                                                        value={member.isApproved || "PENDING"}
+                                                        onChange={e => handleApproval(e.target.value, member.id)}
+                                                        className={`px-2 py-1 rounded-full text-xs font-medium outline-none} ${getStatusBadgeColor(member.isApproved)}`}
                                                     >
-                                                        <Info size={18} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleEdit(family.id)}
-                                                        className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
-                                                        title="Edit"
-                                                    >
-                                                        <Edit size={18} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(family.id)}
-                                                        className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
-                                                        title="Delete"
-                                                    >
-                                                        <Trash size={18} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
+                                                        <option value="PENDING">PENDING</option>
+                                                        <option value="APPROVED">APPROVED</option>
+                                                        <option value="REJECTED">REJECTED</option>
+                                                    </select>
+                                                </td>
+
+                                                {/* Action Buttons */}
+                                                <td className="py-4 px-4 whitespace-nowrap">
+                                                    <div className="flex space-x-2">
+                                                        <button
+                                                            onClick={() => handleViewDetails(member.id)}
+                                                            className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
+                                                            title="View Details"
+                                                        >
+                                                            <Info size={18} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleEdit(member.id)}
+                                                            className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
+                                                            title="Edit"
+                                                        >
+                                                            <Edit size={18} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(member.id)}
+                                                            className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
+                                                            title="Delete"
+                                                        >
+                                                            <Trash size={18} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="py-8 text-center text-gray-500">
+                                        <td colSpan="8" className="py-8 text-center text-gray-500">
                                             {familyHeadsData.length === 0 ? "Loading data..." : "No families found matching your search."}
                                         </td>
                                     </tr>
                                 )}
+
                             </tbody>
                         </table>
                     </div>
@@ -336,4 +386,4 @@ function FmailyMembers() {
     );
 }
 
-export default FmailyMembers;
+export default AdminFmailyMembers;

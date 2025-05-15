@@ -69,9 +69,9 @@ model Member {
   deathCertificate    String?
   marriageCertificate String?
   isRemoved           Boolean      @default(false)
-  isApproved          Boolean      @default(false)
-  headId              Int? // Add this field for the relation
-  head                FamilyHead?  @relation("FamilyHeadMembers", fields: [headId], references: [id]) // Match the relation name
+  isApproved          Status       @default(PENDING)
+  headId              Int?
+  head                FamilyHead?  @relation("FamilyHeadMembers", fields: [headId], references: [id])
   idExpiryDate        DateTime?
   idRestored          Boolean      @default(false)
   restorationDate     DateTime?
@@ -117,6 +117,12 @@ enum MemberStatus {
 }
 
 enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Status {
   PENDING
   APPROVED
   REJECTED
