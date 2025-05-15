@@ -71,9 +71,9 @@ function FmailyMembers() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const result = await api.get('/admin/get-family-header');
+                const result = await api.get('/user/get-members');
                 if (result.data.status) {
-                    setFamilyHeadsData(result.data.familyHeader);
+                    setFamilyHeadsData(result.data.familyMembers);
                 } else {
                     console.log(result.data.message);
                 }
@@ -137,7 +137,7 @@ function FmailyMembers() {
                     </button>
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">Family Headers</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">Family Members</h1>
 
                     <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
                         <div className="relative flex-grow">
@@ -171,10 +171,10 @@ function FmailyMembers() {
                                 <tr>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact Info</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">House #</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Family Size</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birth Date</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relation</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
@@ -184,10 +184,32 @@ function FmailyMembers() {
                                         <tr key={family.id} className="hover:bg-gray-50 transition-colors duration-150">
                                             <td className="py-4 px-4 whitespace-nowrap">{family.id}</td>
                                             <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{family.fullName}</td>
-                                            <td className="py-4 px-4 whitespace-nowrap text-gray-700">{family.contactInfo}</td>
-                                            <td className="py-4 px-4 whitespace-nowrap text-gray-700">{family.email}</td>
-                                            <td className="py-4 px-4 whitespace-nowrap text-gray-700">{family.houseNumber}</td>
-                                            <td className="py-4 px-4 whitespace-nowrap text-gray-700">{family.familysize}</td>
+                                            <td className="p-3 text-sm text-gray-500">
+                                                {new Date(family.birthDate).toLocaleDateString('en-GB', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                }).replace(' ', '.')}
+                                            </td>
+                                            <td className="py-4 px-4 whitespace-nowrap text-gray-700">{family.relationship}</td>
+                                            <td className="p-3 text-sm text-gray-500">
+                                                {new Date(family.createdAt).toLocaleDateString('en-GB', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                }).replace(' ', '.')}
+                                            </td>
+                                            {
+                                                family.isApproved === false ? (
+                                                    <td className="py-4 px-5  whitespace-nowrap text-gray-700 ">
+                                                        <span className='bg-red-100 rounded-2xl px-2 text-red-800'>Pending</span>
+                                                    </td>
+                                                ) : (
+                                                    <td className="py-4 px-4 whitespace-nowrap text-gray-700">
+                                                        <span className='bg-green-100 rounded-2xl px-2 text-green-800'>Approved</span>
+                                                    </td>
+                                                )
+                                            }
                                             <td className="py-4 px-4 whitespace-nowrap">
                                                 <div className="flex space-x-2">
                                                     <button

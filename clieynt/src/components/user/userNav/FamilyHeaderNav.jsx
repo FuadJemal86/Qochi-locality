@@ -217,7 +217,7 @@ export default function FamilyHeaderNav() {
                         <li>
                             <NavItem
                                 icon={<UserPlus className="h-5 w-5" />}
-                                label="ID"
+                                label="ID Request"
                                 id="id"
                                 isActive={activeItem === 'id'}
                                 onClick={() => {
