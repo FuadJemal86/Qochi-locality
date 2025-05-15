@@ -9,6 +9,7 @@ import AddFamilyHeader from './components/admin/adminNav/AddFamilyHeader';
 import FamilyHeaderNav from './components/user/userNav/FamilyHeaderNav';
 import FmailyMembers from './components/user/userNav/FamilyMembers';
 import AddFamilyMember from './components/user/userNav/AddFamilyMember';
+import AdminFmailyMembers from './components/admin/adminNav/AdminFmailyMembers';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -18,9 +19,11 @@ function App() {
       <Routes>
         <Route path='/' element={<Login />} />
 
+        {/* Admin */}
         <Route path="/admin-dashboard" element={<AdminNav />}>
           <Route path='family-headers' element={<FamilyHeaders />} />
           <Route path='add-family-header' element={<AddFamilyHeader />} />
+          <Route path='family-members' element={<AdminFmailyMembers />} />
 
 
 

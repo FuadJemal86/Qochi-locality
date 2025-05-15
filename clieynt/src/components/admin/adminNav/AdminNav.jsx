@@ -70,14 +70,14 @@ export default function AdminNav() {
     };
 
 
-    // Navigation item component with improved focus effects
+    // Navigation item component with improved click-only focus handling
     const NavItem = ({ icon, label, id, hasDropdown = false, onClick, isActive }) => {
         return (
             <button
                 onClick={onClick}
                 className={`flex items-center justify-between w-full px-4 py-3 rounded-md transition-all duration-200 ${isActive
                     ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-800'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white focus:outline-none'
                     }`}
             >
                 <div className="flex items-center">
@@ -91,7 +91,7 @@ export default function AdminNav() {
         );
     };
 
-    // Dropdown item component
+    // Dropdown item component with improved click-only focus
     const DropdownItem = ({ icon, label, id, onClick }) => {
         return (
             <a
@@ -103,7 +103,7 @@ export default function AdminNav() {
                 }}
                 className={`flex items-center px-4 py-2 text-sm rounded-md transition-all duration-200 ${activeItem === id
                     ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-700'
+                    : 'text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none'
                     }`}
             >
                 {icon}
@@ -130,7 +130,7 @@ export default function AdminNav() {
                     {!isMobile && (
                         <button
                             onClick={toggleSidebar}
-                            className="p-1 rounded-full text-gray-400 hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="p-1 rounded-full text-gray-400 hover:bg-gray-800 hover:text-white focus:outline-none"
                         >
                             {sidebarOpen ? <ChevronDown className="h-5 w-5 rotate-90" /> : <ChevronDown className="h-5 w-5 -rotate-90" />}
                         </button>
@@ -138,7 +138,7 @@ export default function AdminNav() {
                     {isMobile && (
                         <button
                             onClick={toggleSidebar}
-                            className="p-1 rounded-full text-gray-400 hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="p-1 rounded-full text-gray-400 hover:bg-gray-800 hover:text-white focus:outline-none"
                         >
                             <X className="h-5 w-5" />
                         </button>
@@ -178,16 +178,18 @@ export default function AdminNav() {
 
                         {/* Users Section */}
                         <li>
-                            <NavItem
-                                icon={<Users className="h-5 w-5" />}
-                                label="Members"
-                                id="members"
-                                hasDropdown={true}
-                                isActive={activeDropdown === 'users'}
-                                onClick={() => toggleDropdown('users')}
-                            />
+                            <Link to={'/admin-dashboard/family-members'}>
+                                <NavItem
+                                    icon={<Users className="h-5 w-5" />}
+                                    label="Members"
+                                    id="members"
+                                    hasDropdown={true}
+                                    isActive={activeDropdown === 'members'}
+                                    onClick={() => toggleDropdown('members')}
+                                />
+                            </Link>
 
-                            {sidebarOpen && activeDropdown === 'users' && (
+                            {sidebarOpen && activeDropdown === 'members' && (
                                 <ul className="mt-2 pl-6 space-y-2">
                                     <li>
                                         <DropdownItem
@@ -238,7 +240,7 @@ export default function AdminNav() {
                         <div className="flex items-center">
                             {isMobile && (
                                 <button
-                                    className="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none"
                                     onClick={toggleSidebar}
                                 >
                                     {sidebarOpen ? <X className="h-6 w-6" /> : <ArrowRight className="h-6 w-6" />}
@@ -251,16 +253,16 @@ export default function AdminNav() {
 
                         {/* Header Right */}
                         <div className="flex items-center space-x-4">
-                            <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 relative">
+                            <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none relative">
                                 <Bell className="h-6 w-6" />
                                 <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
                             </button>
 
                             <div className="flex items-center gap-3">
-                                <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 relative">
+                                <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none relative">
                                     <CircleUser className="h-6 w-6" />
                                 </button>
-                                <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 relative">
+                                <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none relative">
                                     <Settings className="h-6 w-6" />
                                 </button>
                             </div>
