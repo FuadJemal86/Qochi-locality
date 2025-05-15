@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../../../../api';
 
-function FamilyHeaders() {
+function FmailyMembers() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [selectedFamilyId, setSelectedFamilyId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -154,10 +154,11 @@ function FamilyHeaders() {
                         <button
                             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md flex items-center gap-2 transition-colors duration-200"
                         >
-
-                            <Link className='flex items-center gap-1' to={'/admin-dashboard/add-family-header'}>
+                            <Link className='flex items-center gap-1' to={'/family-head-dashboard/add-family-members'}>
                                 <UserPlus size={18} />
-                                Add FH</Link>
+
+                                Add Members
+                            </Link>
                         </button>
                     </div>
                 </div>
@@ -313,4 +314,4 @@ function FamilyHeaders() {
     );
 }
 
-export default FamilyHeaders;
+export default FmailyMembers;

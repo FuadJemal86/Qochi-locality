@@ -23,7 +23,6 @@ model Family {
   address    String
   headId     Int        @unique
   head       FamilyHead @relation(fields: [headId], references: [id])
-  members    Member[]
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
@@ -39,8 +38,9 @@ model FamilyHead {
   familysize  String
   family      Family?
   isRemoved   Boolean     @default(false)
-  idRequests  IDRequest[] // Add this line for the reverse relation
-  payments    Payment[] // Link to payments
+  idRequests  IDRequest[]
+  payments    Payment[]
+  members     Member[]    @relation("FamilyHeadMembers") // Add the relation name
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -70,13 +70,13 @@ model Member {
   marriageCertificate String?
   isRemoved           Boolean      @default(false)
   isApproved          Boolean      @default(false)
-  familyId            Int
-  family              Family       @relation(fields: [familyId], references: [id])
+  headId              Int? // Add this field for the relation
+  head                FamilyHead?  @relation("FamilyHeadMembers", fields: [headId], references: [id]) // Match the relation name
   idExpiryDate        DateTime?
   idRestored          Boolean      @default(false)
   restorationDate     DateTime?
   restorationPayment  Float?
-  idRequests          IDRequest[] // Add this line for the reverse relation
+  idRequests          IDRequest[]
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
 }
