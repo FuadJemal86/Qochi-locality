@@ -192,16 +192,6 @@ export default function FamilyHeaderNav() {
                                     <li>
                                         <DropdownItem
                                             icon={<UserX className="h-4 w-4" />}
-                                            label="Rejected Members"
-                                            id="rejected-members"
-                                            onClick={() => {
-                                                if (isMobile) setSidebarOpen(false);
-                                            }}
-                                        />
-                                    </li>
-                                    <li>
-                                        <DropdownItem
-                                            icon={<UserX className="h-4 w-4" />}
                                             label="Removed Members"
                                             id="removed-members"
                                             onClick={() => {
@@ -213,8 +203,23 @@ export default function FamilyHeaderNav() {
                             )}
                         </li>
 
-                        {/* Reports Section */}
                         <li>
+                            <Link to={'/family-head-dashboard/rejected-memebrs'}>
+                                <NavItem
+                                    icon={<UserX className="h-5 w-5" />}
+                                    label="Rejected Members"
+                                    id="rejected-members"
+                                    isActive={activeItem === 'rejected-members'}
+                                    onClick={() => {
+                                        setActiveItem('rejected-members');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                />
+                            </Link>
+                        </li>
+
+                        {/* Reports Section */}
+                        {/* <li>
                             <NavItem
                                 icon={<UserPlus className="h-5 w-5" />}
                                 label="ID Request"
@@ -222,6 +227,19 @@ export default function FamilyHeaderNav() {
                                 isActive={activeItem === 'id'}
                                 onClick={() => {
                                     setActiveItem('id');
+                                    if (isMobile) setSidebarOpen(false);
+                                }}
+                            />
+                        </li> */}
+
+                        <li>
+                            <NavItem
+                                icon={<Settings className="h-5 w-5" />}
+                                label="Setting"
+                                id="Setting"
+                                isActive={activeItem === 'Setting'}
+                                onClick={() => {
+                                    setActiveItem('Setting');
                                     if (isMobile) setSidebarOpen(false);
                                 }}
                             />

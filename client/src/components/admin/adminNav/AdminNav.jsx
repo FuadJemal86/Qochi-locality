@@ -194,16 +194,6 @@ export default function AdminNav() {
                                     <li>
                                         <DropdownItem
                                             icon={<UserX className="h-4 w-4" />}
-                                            label="Rejected Members"
-                                            id="rejected-members"
-                                            onClick={() => {
-                                                if (isMobile) setSidebarOpen(false);
-                                            }}
-                                        />
-                                    </li>
-                                    <li>
-                                        <DropdownItem
-                                            icon={<UserX className="h-4 w-4" />}
                                             label="Removed Members"
                                             id="removed-members"
                                             onClick={() => {
@@ -213,6 +203,20 @@ export default function AdminNav() {
                                     </li>
                                 </ul>
                             )}
+                        </li>
+
+                        <li>
+                            <Link to={'/admin-dashboard/rejected-family-member'}>
+                                <NavItem
+                                    icon={<UserX className="h-5 w-5" />}
+                                    label="Rejected Members"
+                                    id="Rejected Members"
+                                    isActive={activeItem === 'Rejected Members'}
+                                    onClick={() => {
+                                        setActiveItem('Rejected Members');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                /></Link>
                         </li>
 
                         {/* Reports Section */}

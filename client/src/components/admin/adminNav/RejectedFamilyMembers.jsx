@@ -4,18 +4,12 @@ import { Edit, Trash, Info, UserPlus, X, Search, ChevronLeft, ChevronRight, Prin
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../../../../api';
-import toast, { Toaster } from 'react-hot-toast';
 
-function AdminFmailyMembers() {
+function RejectedFamilyMember() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
-    const [selectedFamilyId, setSelectedFamilyId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [familyHeadsData, setFamilyHeadsData] = useState([]);
-    const [familyMembersData, setFamilyMembersData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
-    const [statusState, setStatusState] = useState({
-        status: ''
-    })
     const itemsPerPage = 5;
 
     const getStatusBadgeColor = (status) => {
@@ -41,26 +35,7 @@ function AdminFmailyMembers() {
     const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-    const handleViewDetails = async (id) => {
-        setSelectedFamilyId(id);
-        try {
-            // Fetch family members data for the selected family
-            const response = await api.get(`/admin/get-family-members/${id}`);
-            if (response.data.status) {
-                setFamilyMembersData(prevData => ({
-                    ...prevData,
-                    [id]: response.data.familyMembers
-                }));
-            }
-        } catch (err) {
-            console.error('Error fetching family members:', err);
-            setFamilyMembersData(prevData => ({
-                ...prevData,
-                [id]: []
-            }));
-        }
-        setShowDetailsModal(true);
-    };
+
 
     const handleEdit = (id) => {
         // Handle edit logic here
@@ -83,21 +58,20 @@ function AdminFmailyMembers() {
     };
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get('/admin/get-rejected-member');
+                if (result.data.status) {
+                    setFamilyHeadsData(result.data.rejectedMember);
+                } else {
+                    console.log(result.data.message);
+                }
+            } catch (err) {
+                console.error('Error fetching family headers:', err);
+            }
+        };
         fetchData();
     }, []);
-
-    const fetchData = async () => {
-        try {
-            const result = await api.get('/admin/get-members');
-            if (result.data.status) {
-                setFamilyHeadsData(result.data.familyMembers);
-            } else {
-                console.log(result.data.message);
-            }
-        } catch (err) {
-            console.error('Error fetching family headers:', err);
-        }
-    };
 
     // print the customer table
     const handlePrint = () => {
@@ -134,30 +108,8 @@ function AdminFmailyMembers() {
         saveAs(data, "Families.xlsx");
     };
 
-
-
-    const handleApproval = async (value, id) => {
-        try {
-            const result = await api.put(`/admin/member-approval/${id}`, {
-                ...statusState,
-                status: value
-            })
-
-            if (result.data.status) {
-                toast.success(result.data.message)
-                fetchData()
-            } else {
-                console.log(result.data.message)
-            }
-
-        } catch (err) {
-            console.log(err)
-        }
-
-    }
     return (
         <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
-            <Toaster position="top-center" reverseOrder={false} />
             <div className="bg-white rounded-xl shadow-lg p-4 md:p-6 border border-gray-100">
                 <div className="flex justify-end mb-4 gap-2">
                     <button
@@ -174,7 +126,7 @@ function AdminFmailyMembers() {
                     </button>
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">Family Members</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">Rejected Family Members</h1>
 
                     <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
                         <div className="relative flex-grow">
@@ -198,7 +150,6 @@ function AdminFmailyMembers() {
                                 <tr>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Header Name</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birth Date</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relation</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
@@ -208,93 +159,65 @@ function AdminFmailyMembers() {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {currentItems.length > 0 ? (
-                                    currentItems.map((family) =>
-                                        family.members.map((member) => (
-                                            <tr key={`${family.id}-${member.id}`} className="hover:bg-gray-50 transition-colors duration-150">
-                                                {/* Family ID */}
-                                                <td className="py-4 px-4 whitespace-nowrap">{family.id}</td>
-
-                                                {/* Family Head Name */}
-                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{family.fullName || "No Family Name"}</td>
-
-                                                {/* Member Name */}
-                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.fullName || "No Member Name"}</td>
-
-                                                {/* Member Birth Date */}
-                                                <td className="p-3 text-sm text-gray-500">
-                                                    {member.birthDate
-                                                        ? new Date(member.birthDate).toLocaleDateString("en-GB", {
-                                                            day: "numeric",
-                                                            month: "long",
-                                                            year: "numeric",
-                                                        }).replace(/ /g, ".")
-                                                        : "No Birth Date"}
-                                                </td>
-
-                                                {/* Relationship */}
-                                                <td className="py-4 px-4 whitespace-nowrap text-gray-700">{member.relationship || "No Relationship"}</td>
-
-                                                {/* Member Created At */}
-                                                <td className="p-3 text-sm text-gray-500">
-                                                    {member.createdAt
-                                                        ? new Date(member.createdAt).toLocaleDateString("en-GB", {
-                                                            day: "numeric",
-                                                            month: "long",
-                                                            year: "numeric",
-                                                        }).replace(/ /g, ".")
-                                                        : "No Created Date"}
-                                                </td>
-
-                                                {/* Approval Status */}
-                                                <td>
-                                                    <select
-                                                        value={member.isApproved || "PENDING"}
-                                                        onChange={e => handleApproval(e.target.value, member.id)}
-                                                        className={`px-2 py-1 rounded-full text-xs font-medium outline-none} ${getStatusBadgeColor(member.isApproved)}`}
+                                    currentItems.map((family) => (
+                                        <tr key={family.id} className="hover:bg-gray-50 transition-colors duration-150">
+                                            <td className="py-4 px-4 whitespace-nowrap">{family.id}</td>
+                                            <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{family.fullName}</td>
+                                            <td className="p-3 text-sm text-gray-500">
+                                                {new Date(family.birthDate).toLocaleDateString('en-GB', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                }).replace(' ', '.')}
+                                            </td>
+                                            <td className="py-4 px-4 whitespace-nowrap text-gray-700">{family.relationship}</td>
+                                            <td className="p-3 text-sm text-gray-500">
+                                                {new Date(family.createdAt).toLocaleDateString('en-GB', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                }).replace(' ', '.')}
+                                            </td>
+                                            <td>
+                                                <span
+                                                    className={`px-2 py-1 rounded-full text-xs font-medium outline-none ${getStatusBadgeColor(family.isApproved)}`}>
+                                                    {family.isApproved}
+                                                </span>
+                                            </td>
+                                            <td className="py-4 px-4 whitespace-nowrap">
+                                                <div className="flex space-x-2">
+                                                    <button
+                                                        onClick={() => handleViewDetails(family.id)}
+                                                        className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
+                                                        title="View Details"
                                                     >
-                                                        <option value="PENDING">PENDING</option>
-                                                        <option value="APPROVED">APPROVED</option>
-                                                        <option value="REJECTED">REJECTED</option>
-                                                    </select>
-                                                </td>
-
-                                                {/* Action Buttons */}
-                                                <td className="py-4 px-4 whitespace-nowrap">
-                                                    <div className="flex space-x-2">
-                                                        <button
-                                                            onClick={() => handleViewDetails(member.id)}
-                                                            className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
-                                                            title="View Details"
-                                                        >
-                                                            <Info size={18} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleEdit(member.id)}
-                                                            className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
-                                                            title="Edit"
-                                                        >
-                                                            <Edit size={18} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDelete(member.id)}
-                                                            className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
-                                                            title="Delete"
-                                                        >
-                                                            <Trash size={18} />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )
+                                                        <Info size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleEdit(family.id)}
+                                                        className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
+                                                        title="Edit"
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(family.id)}
+                                                        className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash size={18} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="8" className="py-8 text-center text-gray-500">
-                                            {familyHeadsData.length === 0 ? "Loading data..." : "No families found matching your search."}
+                                        <td colSpan="7" className="py-8 text-center text-gray-500">
+                                            {familyHeadsData.length === 0 ? "No rejected family found" : "No families found matching your search."}
                                         </td>
                                     </tr>
                                 )}
-
                             </tbody>
                         </table>
                     </div>
@@ -387,4 +310,4 @@ function AdminFmailyMembers() {
     );
 }
 
-export default AdminFmailyMembers;
+export default RejectedFamilyMember;

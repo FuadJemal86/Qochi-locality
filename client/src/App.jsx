@@ -10,6 +10,9 @@ import FamilyHeaderNav from './components/user/userNav/FamilyHeaderNav';
 import FmailyMembers from './components/user/userNav/FamilyMembers';
 import AddFamilyMember from './components/user/userNav/AddFamilyMember';
 import AdminFmailyMembers from './components/admin/adminNav/AdminFmailyMembers';
+import RejectedMember from './components/user/userNav/RejectedMember';
+import EditFamilyMemeber from './components/user/userNav/EditFamilyMemeber';
+import RejectedFamilyMember from './components/admin/adminNav/RejectedFamilyMembers';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -24,18 +27,15 @@ function App() {
           <Route path='family-headers' element={<FamilyHeaders />} />
           <Route path='add-family-header' element={<AddFamilyHeader />} />
           <Route path='family-members' element={<AdminFmailyMembers />} />
-
-
-
+          <Route path='rejected-family-member' element={<RejectedFamilyMember />} />
         </Route>
 
         {/* family header Dashboard */}
         <Route path="/family-head-dashboard" element={<FamilyHeaderNav />}>
           <Route path='family-members' element={<FmailyMembers />} />
           <Route path='add-family-members' element={<AddFamilyMember />} />
-
-
-
+          <Route path='rejected-memebrs' element={<RejectedMember />} />
+          <Route path='edit-family-member/:id' element={<EditFamilyMemeber />} />
 
         </Route>
       </Routes>

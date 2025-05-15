@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Edit, Trash, Info, UserPlus, X, Search, ChevronLeft, ChevronRight, Printer, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../../../../api';
 
 function FmailyMembers() {
+    const navigate = useNavigate()
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [selectedFamilyId, setSelectedFamilyId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -60,6 +61,7 @@ function FmailyMembers() {
 
     const handleEdit = (id) => {
         // Handle edit logic here
+        navigate(`/family-head-dashboard/edit-family-member/${id}`)
         console.log(`Edit family with ID: ${id}`);
     };
 
@@ -225,12 +227,14 @@ function FmailyMembers() {
                                                         <Info size={18} />
                                                     </button>
                                                     <button
+
                                                         onClick={() => handleEdit(family.id)}
                                                         className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
                                                         title="Edit"
                                                     >
                                                         <Edit size={18} />
                                                     </button>
+
                                                     <button
                                                         onClick={() => handleDelete(family.id)}
                                                         className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
