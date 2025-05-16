@@ -20,7 +20,8 @@ import {
     LogOut,
     CircleUser,
     ArrowRight,
-    ArrowLeft
+    ArrowLeft,
+    Settings2
 } from 'lucide-react';
 
 export default function AdminNav() {
@@ -84,33 +85,11 @@ export default function AdminNav() {
                     {icon}
                     {(!collapsed || isMobile) && <span className={`ml-3 font-medium ${isActive ? 'text-white' : 'group-hover:text-white'}`}>{label}</span>}
                 </div>
-                {(!collapsed || isMobile) && hasDropdown && (
-                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isActive ? 'transform rotate-180' : ''}`} />
-                )}
             </button>
         );
     };
 
-    // Dropdown item component with improved click-only focus
-    const DropdownItem = ({ icon, label, id, onClick }) => {
-        return (
-            <a
-                href="#"
-                onClick={(e) => {
-                    e.preventDefault();
-                    setActiveItem(id);
-                    if (onClick) onClick();
-                }}
-                className={`flex items-center px-4 py-2 text-sm rounded-md transition-all duration-200 ${activeItem === id
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none'
-                    }`}
-            >
-                {icon}
-                <span className="ml-3">{label}</span>
-            </a>
-        );
-    };
+
 
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
@@ -173,10 +152,10 @@ export default function AdminNav() {
                                         setActiveItem('family-headers');
                                         if (isMobile) setSidebarOpen(false);
                                     }}
-                                /></Link>
+                                />
+                            </Link>
                         </li>
 
-                        {/* Users Section */}
                         <li>
                             <Link to={'/admin-dashboard/family-members'}>
                                 <NavItem
@@ -184,25 +163,29 @@ export default function AdminNav() {
                                     label="Members"
                                     id="members"
                                     hasDropdown={true}
-                                    isActive={activeDropdown === 'members'}
-                                    onClick={() => toggleDropdown('members')}
+                                    isActive={activeItem === 'members'}
+                                    onClick={() => {
+                                        setActiveItem('members');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
                                 />
                             </Link>
+                        </li>
 
-                            {sidebarOpen && activeDropdown === 'members' && (
-                                <ul className="mt-2 pl-6 space-y-2">
-                                    <li>
-                                        <DropdownItem
-                                            icon={<UserX className="h-4 w-4" />}
-                                            label="Removed Members"
-                                            id="removed-members"
-                                            onClick={() => {
-                                                if (isMobile) setSidebarOpen(false);
-                                            }}
-                                        />
-                                    </li>
-                                </ul>
-                            )}
+                        <li>
+                            <Link to={'/admin-dashboard/family-members'}>
+                                <NavItem
+                                    icon={<UserX className="h-5 w-5" />}
+                                    label="Removed members"
+                                    id="removed-members"
+                                    hasDropdown={true}
+                                    isActive={activeItem === 'removed-members'}
+                                    onClick={() => {
+                                        setActiveItem('removed-members');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                />
+                            </Link>
                         </li>
 
                         <li>
@@ -210,24 +193,38 @@ export default function AdminNav() {
                                 <NavItem
                                     icon={<UserX className="h-5 w-5" />}
                                     label="Rejected Members"
-                                    id="Rejected Members"
-                                    isActive={activeItem === 'Rejected Members'}
+                                    id="rejected Members"
+                                    isActive={activeItem === 'rejected Members'}
                                     onClick={() => {
-                                        setActiveItem('Rejected Members');
+                                        setActiveItem('rejected Members');
                                         if (isMobile) setSidebarOpen(false);
                                     }}
-                                /></Link>
+                                />
+                            </Link>
                         </li>
 
                         {/* Reports Section */}
                         <li>
                             <NavItem
                                 icon={<UserPlus className="h-5 w-5" />}
-                                label="ID"
-                                id="id"
-                                isActive={activeItem === 'id'}
+                                label="New Members"
+                                id="new Members"
+                                isActive={activeItem === 'new Members'}
                                 onClick={() => {
-                                    setActiveItem('id');
+                                    setActiveItem('new Members');
+                                    if (isMobile) setSidebarOpen(false);
+                                }}
+                            />
+                        </li>
+
+                        <li>
+                            <NavItem
+                                icon={<Settings className="h-5 w-5" />}
+                                label="Setting"
+                                id="setting"
+                                isActive={activeItem === 'setting'}
+                                onClick={() => {
+                                    setActiveItem('setting');
                                     if (isMobile) setSidebarOpen(false);
                                 }}
                             />

@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { User, Calendar, Baby, FileCheck, Briefcase, GraduationCap, Heart, Frown, MapPin, Camera, AlertCircle } from "lucide-react";
+import { useParams } from "react-router-dom";
+import api from "../../../../api";
 
 export default function EditFamilyMemeber() {
     // Simulate fetching existing member data
+
+    const { id } = useParams()
     const [member, setMember] = useState({
         id: 1,
         fullName: "John Smith",
@@ -32,6 +36,25 @@ export default function EditFamilyMemeber() {
     const isMarried = formData.status === "MARRIED";
     const hasLeftLocality = formData.status === "LEFT_LOCALITY";
 
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get(`/user/get-edited-member/:${id}`)
+
+                if (result.data.status) {
+                    setMember(result.data.editMember)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        fetchData()
+
+    })
     // Check if status has changed
     useEffect(() => {
         if (member.status !== formData.status) {
