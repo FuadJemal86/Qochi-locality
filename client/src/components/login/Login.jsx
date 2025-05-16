@@ -12,13 +12,8 @@ function Login() {
         role: "admin" // Default role selection
     })
 
-    // Add CSS to prevent vertical scrolling
-    React.useEffect(() => {
-        document.body.style.overflow = 'hidden'
-        return () => {
-            document.body.style.overflow = 'auto'
-        }
-    }, [])
+    // Remove the overflow: hidden effect that was preventing scrolling
+    // We don't need the useEffect that was blocking scrolling
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -49,7 +44,9 @@ function Login() {
     }
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        // Add min-h-screen to ensure the container is at least the height of the viewport
+        // Changed fixed height to min-height to allow scrolling
+        <div className="flex min-h-screen bg-gray-50 flex-col md:flex-row">
             <Toaster position="top-center" reverseOrder={false} />
 
             {/* Left section - Login Form */}
