@@ -14,7 +14,8 @@ import {
     Loader2,
     Eye,
     EyeOff,
-    HelpCircle
+    HelpCircle,
+    Building
 } from 'lucide-react';
 import api from '../../../../api';
 
@@ -26,6 +27,7 @@ const AddFamilyHeader = () => {
     const passwordRef = useRef(null);
     const houseNumberRef = useRef(null);
     const familySizeRef = useRef(null);
+    const headerTypeRef = useRef(null);
 
     // State for form management that won't interfere with typing
     const [errors, setErrors] = useState({});
@@ -46,6 +48,7 @@ const AddFamilyHeader = () => {
         const password = passwordRef.current?.value || '';
         const houseNumber = houseNumberRef.current?.value || '';
         const familySize = familySizeRef.current?.value || '';
+        const headerType = headerTypeRef.current?.value || '';
 
         // Basic validation
         if (!fullName.trim()) newErrors.fullName = "Full name is required";
@@ -65,6 +68,7 @@ const AddFamilyHeader = () => {
 
         if (!houseNumber.trim()) newErrors.houseNumber = "House number is required";
         if (!familySize.trim()) newErrors.familySize = "Family size is required";
+        if (!headerType) newErrors.headerType = "Home type is required";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -84,6 +88,7 @@ const AddFamilyHeader = () => {
             formData.append('password', passwordRef.current?.value || '');
             formData.append('houseNumber', houseNumberRef.current?.value || '');
             formData.append('familysize', familySizeRef.current?.value || '');
+            formData.append('type', headerTypeRef.current?.value || '');
             formData.append('isRemoved', 'false');
 
             if (image) {
@@ -113,7 +118,7 @@ const AddFamilyHeader = () => {
                 setLoading(false);
             }
         } else {
-            if (Object.keys(errors).some(key => ['fullName', 'contactInfo', 'email', 'password', 'houseNumber', 'familySize'].includes(key))) {
+            if (Object.keys(errors).some(key => ['fullName', 'contactInfo', 'email', 'password', 'houseNumber', 'familySize', 'headerType'].includes(key))) {
                 setActiveTab('basic');
             }
         }
@@ -204,6 +209,54 @@ const AddFamilyHeader = () => {
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
                     )}
+                </div>
+                {errors[name] && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center">
+                        <AlertCircle size={14} className="mr-1" /> {errors[name]}
+                    </p>
+                )}
+            </div>
+        );
+    };
+
+    // Select Field component for dropdown
+    const SelectField = ({ name, label, icon, options, required = false, tooltip = null, inputRef }) => {
+        return (
+            <div className="mb-4">
+                <div className="flex items-center mb-1">
+                    <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+                        {label} {required && <span className="text-red-500">*</span>}
+                    </label>
+                    {tooltip && (
+                        <div className="group relative ml-1">
+                            <HelpCircle size={14} className="text-gray-400" />
+                            <div className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 w-48">
+                                {tooltip}
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        {icon}
+                    </div>
+                    <select
+                        id={name}
+                        name={name}
+                        ref={inputRef}
+                        onFocus={() => handleFocus(name)}
+                        className={`pl-10 block w-full rounded-lg border ${errors[name]
+                            ? 'border-red-300 ring-1 ring-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
+                            : 'border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                            } shadow-sm p-2.5 text-gray-900 bg-white outline-none transition-all duration-200`}
+                    >
+                        <option value="">Select {label}</option>
+                        {options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
                 </div>
                 {errors[name] && (
                     <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -329,6 +382,21 @@ const AddFamilyHeader = () => {
                                             inputRef={familySizeRef}
                                         />
                                     </div>
+
+                                    {/* Added Header Type Select Field */}
+                                    <SelectField
+                                        name="headerType"
+                                        label="Home Type"
+                                        icon={<Building size={18} />}
+                                        options={[
+                                            { value: 'Private', label: 'Private' },
+                                            { value: 'Rental', label: 'Rental' },
+                                            { value: 'PublicHousing', label: 'Public Housing' }
+                                        ]}
+                                        required
+                                        tooltip="Select the type of home"
+                                        inputRef={headerTypeRef}
+                                    />
                                 </div>
 
                                 {/* Right Column - Profile Image */}

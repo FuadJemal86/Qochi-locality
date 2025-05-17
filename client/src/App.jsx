@@ -13,6 +13,8 @@ import AdminFmailyMembers from './components/admin/adminNav/AdminFmailyMembers';
 import RejectedMember from './components/user/userNav/RejectedMember';
 import EditFamilyMemeber from './components/user/userNav/EditFamilyMemeber';
 import RejectedFamilyMember from './components/admin/adminNav/RejectedFamilyMembers';
+import IdTable from './components/user/userNav/IdTable';
+import IDRequest from './components/user/userNav/IdRequest';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -36,6 +38,8 @@ function App() {
           <Route path='add-family-members' element={<AddFamilyMember />} />
           <Route path='rejected-memebrs' element={<RejectedMember />} />
           <Route path='edit-family-member/:id' element={<EditFamilyMemeber />} />
+          <Route path='id' element={<IdTable />} />
+          <Route path='id-request/:id' element={<IDRequest />} />
 
         </Route>
       </Routes>

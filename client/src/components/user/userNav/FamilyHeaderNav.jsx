@@ -218,6 +218,21 @@ export default function FamilyHeaderNav() {
                             </Link>
                         </li>
 
+                        <li>
+                            <Link to={'/family-head-dashboard/id'}>
+                                <NavItem
+                                    icon={<UserX className="h-5 w-5" />}
+                                    label="Id"
+                                    id="id"
+                                    isActive={activeItem === 'id'}
+                                    onClick={() => {
+                                        setActiveItem('id');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                />
+                            </Link>
+                        </li>
+
                         {/* Reports Section */}
                         {/* <li>
                             <NavItem

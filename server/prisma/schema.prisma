@@ -38,6 +38,7 @@ model FamilyHead {
   familysize  String
   family      Family?
   isRemoved   Boolean     @default(false)
+  type        HeaderType?
   idRequests  IDRequest[]
   payments    Payment[]
   members     Member[]    @relation("FamilyHeadMembers") // Add the relation name
@@ -82,14 +83,27 @@ model Member {
 }
 
 model IDRequest {
-  id           Int           @id @default(autoincrement())
-  familyHeadId Int
-  memberId     Int
-  status       RequestStatus @default(PENDING)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  familyHead   FamilyHead    @relation(fields: [familyHeadId], references: [id])
-  member       Member        @relation(fields: [memberId], references: [id])
+  id               Int           @id @default(autoincrement())
+  familyHeadId     Int
+  memberId         Int
+  fullName         String
+  mothersName      String
+  age              Int
+  gender           String
+  occupation       String
+  phoneNumber      String
+  placeOFBirth     String
+  address          String
+  houseNumber      String
+  Nationality      String
+  emergencyContact String
+  image            String?
+  type             TypeRequest
+  status           RequestStatus @default(PENDING)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  familyHead       FamilyHead    @relation(fields: [familyHeadId], references: [id])
+  member           Member        @relation(fields: [memberId], references: [id])
 }
 
 model Payment {
@@ -120,10 +134,23 @@ enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
+  EXPIRED
 }
 
 enum Status {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum HeaderType {
+  Private
+  Rental
+  PublicHousing
+}
+
+enum TypeRequest {
+  New
+  updated
+  Expired
 }
