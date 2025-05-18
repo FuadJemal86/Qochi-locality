@@ -14,61 +14,57 @@ import {
     Loader2,
     Eye,
     EyeOff,
-    HelpCircle,
     Building
 } from 'lucide-react';
 import api from '../../../../api';
 
 const AddFamilyHeader = () => {
-    // Use refs to directly manage input values without relying on state for each keystroke
-    const fullNameRef = useRef(null);
-    const contactInfoRef = useRef(null);
-    const emailRef = useRef(null);
-    const passwordRef = useRef(null);
-    const houseNumberRef = useRef(null);
-    const familySizeRef = useRef(null);
-    const headerTypeRef = useRef(null);
+    // Form refs
+    const formRef = useRef(null);
+    const imageInputRef = useRef(null);
 
-    // State for form management that won't interfere with typing
+    // Basic states for UI management
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
-    const [activeTab, setActiveTab] = useState('basic');
     const [image, setImage] = useState(null);
 
     const validateForm = () => {
+        if (!formRef.current) return false;
+
+        const form = formRef.current;
         const newErrors = {};
 
-        // Get current values from refs
-        const fullName = fullNameRef.current?.value || '';
-        const contactInfo = contactInfoRef.current?.value || '';
-        const email = emailRef.current?.value || '';
-        const password = passwordRef.current?.value || '';
-        const houseNumber = houseNumberRef.current?.value || '';
-        const familySize = familySizeRef.current?.value || '';
-        const headerType = headerTypeRef.current?.value || '';
+        // Get values from form
+        const fullName = form.fullName.value.trim();
+        const contactInfo = form.contactInfo.value.trim();
+        const email = form.email.value.trim();
+        const password = form.password.value;
+        const houseNumber = form.houseNumber.value.trim();
+        const familySize = form.familysize.value.trim();
+        const type = form.type.value;
 
         // Basic validation
-        if (!fullName.trim()) newErrors.fullName = "Full name is required";
-        if (!contactInfo.trim()) newErrors.contactInfo = "Contact information is required";
+        if (!fullName) newErrors.fullName = "Full name is required";
+        if (!contactInfo) newErrors.contactInfo = "Contact information is required";
 
-        if (!email.trim()) {
+        if (!email) {
             newErrors.email = "Email is required";
         } else if (!/\S+@\S+\.\S+/.test(email)) {
             newErrors.email = "Email is invalid";
         }
 
-        if (!password && activeTab === 'basic') {
+        if (!password) {
             newErrors.password = "Password is required";
-        } else if (password && password.length < 8) {
+        } else if (password.length < 8) {
             newErrors.password = "Password must be at least 8 characters";
         }
 
-        if (!houseNumber.trim()) newErrors.houseNumber = "House number is required";
-        if (!familySize.trim()) newErrors.familySize = "Family size is required";
-        if (!headerType) newErrors.headerType = "Home type is required";
+        if (!houseNumber) newErrors.houseNumber = "House number is required";
+        if (!familySize) newErrors.familySize = "Family size is required";
+        if (!type) newErrors.type = "Home type is required";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -80,46 +76,36 @@ const AddFamilyHeader = () => {
         if (validateForm()) {
             setLoading(true);
 
-            // Create form data from refs
-            const formData = new FormData();
-            formData.append('fullName', fullNameRef.current?.value || '');
-            formData.append('contactInfo', contactInfoRef.current?.value || '');
-            formData.append('email', emailRef.current?.value || '');
-            formData.append('password', passwordRef.current?.value || '');
-            formData.append('houseNumber', houseNumberRef.current?.value || '');
-            formData.append('familysize', familySizeRef.current?.value || '');
-            formData.append('type', headerTypeRef.current?.value || '');
-            formData.append('isRemoved', 'false');
+            // Create form data from form elements
+            const formData = new FormData(formRef.current);
 
+            // Add the image if selected
             if (image) {
                 formData.append('image', image);
             }
 
             try {
-                const result = await api.post('/admin/add-family-header', formData);
+                const response = await api.post('/admin/add-family-header', formData);
 
-                if (result.data.status) {
+                if (response.data.status) {
+                    setLoading(false);
+                    setSuccess(true);
+                    formRef.current.reset();
+                    setPreviewImage(null);
+                    setImage(null);
+
+                    // Reset success message after 5 seconds
                     setTimeout(() => {
-                        console.log('Form data submitted successfully');
-                        setLoading(false);
-                        setSuccess(true);
-
-                        // Reset success message
-                        setTimeout(() => {
-                            setSuccess(false);
-                        }, 5000);
-                    }, 1500);
+                        setSuccess(false);
+                    }, 5000);
                 } else {
                     setLoading(false);
-                    console.log(result.data.message);
+                    alert(response.data.message);
                 }
             } catch (error) {
                 console.error("Error submitting form:", error);
                 setLoading(false);
-            }
-        } else {
-            if (Object.keys(errors).some(key => ['fullName', 'contactInfo', 'email', 'password', 'houseNumber', 'familySize', 'headerType'].includes(key))) {
-                setActiveTab('basic');
+                alert("Failed to add family head. Please try again.");
             }
         }
     };
@@ -138,6 +124,12 @@ const AddFamilyHeader = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            // Check file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert("Image must be smaller than 2MB");
+                return;
+            }
+
             setImage(file);
 
             // Create preview
@@ -155,33 +147,26 @@ const AddFamilyHeader = () => {
         for (let i = 0; i < 12; i++) {
             password += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-        if (passwordRef.current) {
-            passwordRef.current.value = password;
+        if (formRef.current) {
+            formRef.current.password.value = password;
         }
     };
 
     const removeImage = () => {
         setImage(null);
         setPreviewImage(null);
+        if (imageInputRef.current) {
+            imageInputRef.current.value = '';
+        }
     };
 
-    // Input Field component using refs instead of controlled inputs
-    const InputField = ({ name, label, type = "text", icon, placeholder, required = false, tooltip = null, inputRef }) => {
+    // Input Field component
+    const InputField = ({ name, label, type = "text", icon, placeholder, required = false }) => {
         return (
             <div className="mb-4">
-                <div className="flex items-center mb-1">
-                    <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-                        {label} {required && <span className="text-red-500">*</span>}
-                    </label>
-                    {tooltip && (
-                        <div className="group relative ml-1">
-                            <HelpCircle size={14} className="text-gray-400" />
-                            <div className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 w-48">
-                                {tooltip}
-                            </div>
-                        </div>
-                    )}
-                </div>
+                <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+                    {label} {required && <span className="text-red-500">*</span>}
+                </label>
                 <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                         {icon}
@@ -190,14 +175,10 @@ const AddFamilyHeader = () => {
                         type={type === 'password' ? (showPassword ? 'text' : 'password') : type}
                         id={name}
                         name={name}
-                        ref={inputRef}
                         onFocus={() => handleFocus(name)}
-                        className={`pl-10 ${name === 'password' ? 'pr-10' : ''} block w-full rounded-lg border ${errors[name]
-                            ? 'border-red-300 ring-1 ring-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
-                            : 'border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                            } shadow-sm p-2.5 text-gray-900 bg-white outline-none transition-all duration-200`}
+                        className={`pl-10 ${name === 'password' ? 'pr-10' : ''} w-full rounded-lg border ${errors[name] ? 'border-red-300 ring-1 ring-red-500' : 'border-gray-200'
+                            } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm p-2.5 text-gray-900 outline-none transition-all duration-200`}
                         placeholder={placeholder}
-                        autoComplete="off"
                     />
                     {name === 'password' && (
                         <button
@@ -209,54 +190,6 @@ const AddFamilyHeader = () => {
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
                     )}
-                </div>
-                {errors[name] && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center">
-                        <AlertCircle size={14} className="mr-1" /> {errors[name]}
-                    </p>
-                )}
-            </div>
-        );
-    };
-
-    // Select Field component for dropdown
-    const SelectField = ({ name, label, icon, options, required = false, tooltip = null, inputRef }) => {
-        return (
-            <div className="mb-4">
-                <div className="flex items-center mb-1">
-                    <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-                        {label} {required && <span className="text-red-500">*</span>}
-                    </label>
-                    {tooltip && (
-                        <div className="group relative ml-1">
-                            <HelpCircle size={14} className="text-gray-400" />
-                            <div className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2 w-48">
-                                {tooltip}
-                            </div>
-                        </div>
-                    )}
-                </div>
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                        {icon}
-                    </div>
-                    <select
-                        id={name}
-                        name={name}
-                        ref={inputRef}
-                        onFocus={() => handleFocus(name)}
-                        className={`pl-10 block w-full rounded-lg border ${errors[name]
-                            ? 'border-red-300 ring-1 ring-red-500 focus:ring-2 focus:ring-red-500 focus:border-red-500'
-                            : 'border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                            } shadow-sm p-2.5 text-gray-900 bg-white outline-none transition-all duration-200`}
-                    >
-                        <option value="">Select {label}</option>
-                        {options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </select>
                 </div>
                 {errors[name] && (
                     <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -290,28 +223,11 @@ const AddFamilyHeader = () => {
                     )}
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit}>
-                        {/* Form Tabs */}
-                        <div className="border-b border-gray-200">
-                            <nav className="flex px-6" aria-label="Tabs">
-                                <button
-                                    type="button"
-                                    onClick={() => setActiveTab('basic')}
-                                    className={`px-3 py-4 text-sm font-medium border-b-2 ${activeTab === 'basic'
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                        }`}
-                                >
-                                    Basic Information
-                                </button>
-                            </nav>
-                        </div>
-
-                        {/* Basic Information Tab */}
-                        <div className={`p-6 ${activeTab !== 'basic' ? 'hidden' : ''}`}>
+                    <form ref={formRef} onSubmit={handleSubmit}>
+                        <div className="p-6">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 {/* Left Column - Personal Info */}
-                                <div className="md:col-span-2 space-y-6">
+                                <div className="md:col-span-2 space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <InputField
                                             name="fullName"
@@ -319,7 +235,6 @@ const AddFamilyHeader = () => {
                                             icon={<User size={18} />}
                                             placeholder="John Smith"
                                             required
-                                            inputRef={fullNameRef}
                                         />
 
                                         <InputField
@@ -328,7 +243,6 @@ const AddFamilyHeader = () => {
                                             icon={<Phone size={18} />}
                                             placeholder="+1 (555) 123-4567"
                                             required
-                                            inputRef={contactInfoRef}
                                         />
                                     </div>
 
@@ -339,7 +253,6 @@ const AddFamilyHeader = () => {
                                         icon={<Mail size={18} />}
                                         placeholder="john.smith@example.com"
                                         required
-                                        inputRef={emailRef}
                                     />
 
                                     <div className="relative">
@@ -350,8 +263,6 @@ const AddFamilyHeader = () => {
                                             icon={<Lock size={18} />}
                                             placeholder="••••••••"
                                             required
-                                            tooltip="Password must be at least 8 characters long."
-                                            inputRef={passwordRef}
                                         />
                                         <button
                                             type="button"
@@ -370,33 +281,45 @@ const AddFamilyHeader = () => {
                                             icon={<Home size={18} />}
                                             placeholder="123"
                                             required
-                                            inputRef={houseNumberRef}
                                         />
 
                                         <InputField
-                                            name="familySize"
+                                            name="familysize"
                                             label="Family Size"
                                             icon={<Users size={18} />}
                                             placeholder="4"
                                             required
-                                            inputRef={familySizeRef}
                                         />
                                     </div>
 
-                                    {/* Added Header Type Select Field */}
-                                    <SelectField
-                                        name="headerType"
-                                        label="Home Type"
-                                        icon={<Building size={18} />}
-                                        options={[
-                                            { value: 'Private', label: 'Private' },
-                                            { value: 'Rental', label: 'Rental' },
-                                            { value: 'PublicHousing', label: 'Public Housing' }
-                                        ]}
-                                        required
-                                        tooltip="Select the type of home"
-                                        inputRef={headerTypeRef}
-                                    />
+                                    {/* Home Type Select Field */}
+                                    <div className="mb-4">
+                                        <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Home Type <span className="text-red-500">*</span>
+                                        </label>
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                                <Building size={18} />
+                                            </div>
+                                            <select
+                                                id="type"
+                                                name="type"
+                                                onFocus={() => handleFocus("type")}
+                                                className={`pl-10 w-full rounded-lg border ${errors.type ? 'border-red-300 ring-1 ring-red-500' : 'border-gray-200'
+                                                    } shadow-sm p-2.5`}
+                                            >
+                                                <option value="">Select Home Type</option>
+                                                <option value="Private">Private</option>
+                                                <option value="Rental">Rental</option>
+                                                <option value="PublicHousing">Public Housing</option>
+                                            </select>
+                                        </div>
+                                        {errors.type && (
+                                            <p className="mt-1 text-sm text-red-600 flex items-center">
+                                                <AlertCircle size={14} className="mr-1" /> {errors.type}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* Right Column - Profile Image */}
@@ -426,8 +349,7 @@ const AddFamilyHeader = () => {
                                         <label className="cursor-pointer bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-3 py-2 rounded-md text-sm flex items-center transition duration-200">
                                             <Upload size={16} className="mr-2" /> Upload Photo
                                             <input
-                                                id="image"
-                                                name="image"
+                                                ref={imageInputRef}
                                                 type="file"
                                                 accept="image/*"
                                                 onChange={handleImageChange}
@@ -446,14 +368,14 @@ const AddFamilyHeader = () => {
                         <div className="bg-gray-50 px-6 py-4 flex items-center justify-end space-x-3 border-t border-gray-200">
                             <button
                                 type="button"
-                                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className={`px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center ${loading ? "opacity-70 cursor-wait" : ""
+                                className={`px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 flex items-center ${loading ? "opacity-70 cursor-wait" : ""
                                     }`}
                             >
                                 {loading ? (

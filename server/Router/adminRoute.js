@@ -6,6 +6,7 @@ const { getFamilyHeader } = require('../controllers/admin/get.family.header')
 const { getMembers } = require('../controllers/admin/get.members')
 const { memeberApproved } = require('../controllers/admin/memebr.approved')
 const { getMemberRejected } = require('../controllers/admin/get.rejected.member')
+const { getDetailMember } = require('../controllers/admin/get.detail.member')
 
 const router = express.Router()
 
@@ -17,6 +18,7 @@ router.post('/add-family-header', addFamilyHead)
 router.get('/get-family-header', getFamilyHeader)
 router.get('/get-members', getMembers)
 router.get('/get-rejected-member', getMemberRejected)
+router.get('/get-detail-member/:id', getDetailMember)
 
 
 router.put('/member-approval/:id', memeberApproved)

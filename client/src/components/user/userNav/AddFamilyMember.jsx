@@ -1,5 +1,6 @@
+
 import React, { useState } from "react";
-import { User, Calendar, Baby, FileCheck, Briefcase, GraduationCap, Heart, Frown, MapPin, Camera } from "lucide-react";
+import { User, Calendar, Baby, FileCheck, Briefcase, GraduationCap, Heart, Frown, MapPin, Camera, Home } from "lucide-react";
 import api from "../../../../api";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from 'sweetalert2';
@@ -15,6 +16,7 @@ export default function AddFamilyMember() {
         education: "",
         occupation: "",
         status: "ACTIVE",
+        memberType: "Member", // Default value
     });
 
     // Store file objects separately
@@ -23,6 +25,7 @@ export default function AddFamilyMember() {
         image: null,
         deathCertificate: null,
         marriageCertificate: null,
+        memberTypeImage: null, // Added for rental agreement
     });
 
     // Store file names for display purposes
@@ -31,6 +34,7 @@ export default function AddFamilyMember() {
         image: "",
         deathCertificate: "",
         marriageCertificate: "",
+        memberTypeImage: "", // Added for rental agreement
     });
 
     const [activeStep, setActiveStep] = useState(1);
@@ -40,6 +44,7 @@ export default function AddFamilyMember() {
     const isNewborn = formData.type === "NEWBORN";
     const isDeceased = formData.status === "DECEASED";
     const isMarried = formData.status === "MARRIED";
+    const isRental = formData.memberType === "RENTAL";
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -75,8 +80,16 @@ export default function AddFamilyMember() {
         const { fullName, birthDate, relationship } = formData
 
         if (!fullName || !birthDate || !relationship) {
-            toast.error('please fill the input fields!')
+            toast.error('Please fill the required input fields!')
+            return;
         }
+
+        // Validate rental agreement document if member type is rental
+        if (isRental && !fileData.memberTypeImage) {
+            toast.error('Please upload the rental agreement document!');
+            return;
+        }
+
         try {
             // Create FormData object for multipart/form-data submission
             const submitData = new FormData();
@@ -120,6 +133,11 @@ export default function AddFamilyMember() {
         MARRIED: { bg: "bg-rose-100", text: "text-rose-700", icon: <Heart size={18} className="text-rose-600" /> },
         DECEASED: { bg: "bg-gray-100", text: "text-gray-700", icon: <Frown size={18} className="text-gray-600" /> },
         LEFT_LOCALITY: { bg: "bg-amber-100", text: "text-amber-700", icon: <MapPin size={18} className="text-amber-600" /> }
+    };
+
+    const memberTypeColors = {
+        OWNER: { bg: "bg-indigo-100", text: "text-indigo-700", icon: <Home size={18} className="text-indigo-600" /> },
+        RENTAL: { bg: "bg-purple-100", text: "text-purple-700", icon: <Home size={18} className="text-purple-600" /> }
     };
 
     return (
@@ -238,7 +256,7 @@ export default function AddFamilyMember() {
                             <div>
                                 <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
                                     <Heart size={16} className="mr-1 text-blue-500" />
-                                    Relationship
+                                    Relationship *
                                 </label>
                                 <input
                                     type="text"
@@ -249,6 +267,27 @@ export default function AddFamilyMember() {
                                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                                 />
                             </div>
+
+                            <div>
+                                <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
+                                    <Home size={16} className="mr-1 text-blue-500" />
+                                    Member Type *
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {["RENTAL"].map(homeType => (
+                                        <div
+                                            key={homeType}
+                                            onClick={() => setFormData(prev => ({ ...prev, memberType: homeType }))}
+                                            className={`cursor-pointer border rounded-lg px-4 py-3 flex items-center justify-center transition-all duration-200 ${formData.memberType === homeType
+                                                ? `${memberTypeColors[homeType].bg} border-${homeType === "OWNER" ? "indigo" : "purple"}-400 ${memberTypeColors[homeType].text}`
+                                                : "border-gray-200 hover:bg-gray-50"
+                                                }`}
+                                        >
+                                            <Home size={18} className="mr-2" /> {homeType === "OWNER" ? "Owner" : "Rental"}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </>
                 )}
@@ -256,9 +295,16 @@ export default function AddFamilyMember() {
                 {activeStep === 2 && (
                     <>
                         {/* Status Badge */}
-                        <div className={`inline-flex items-center px-3 py-1 rounded-full ${statusColors[formData.status].bg} ${statusColors[formData.status].text} text-sm font-medium`}>
-                            {statusColors[formData.status].icon}
-                            <span className="ml-1">{formData.status.replace('_', ' ')}</span>
+                        <div className="flex flex-wrap gap-2">
+                            <div className={`inline-flex items-center px-3 py-1 rounded-full ${statusColors[formData.status].bg} ${statusColors[formData.status].text} text-sm font-medium`}>
+                                {statusColors[formData.status].icon}
+                                <span className="ml-1">{formData.status.replace('_', ' ')}</span>
+                            </div>
+
+                            <div className={`inline-flex items-center px-3 py-1 rounded-full ${memberTypeColors[formData.memberType].bg} ${memberTypeColors[formData.memberType].text} text-sm font-medium`}>
+                                {memberTypeColors[formData.memberType].icon}
+                                <span className="ml-1">{formData.memberType}</span>
+                            </div>
                         </div>
 
                         {!isNewborn && (
@@ -311,6 +357,21 @@ export default function AddFamilyMember() {
                                 <p className="text-blue-600 text-sm mb-2">Education and occupation fields are not required for newborns.</p>
                             </div>
                         )}
+
+                        {isRental && (
+                            <div className="mt-4 p-6 bg-purple-50 rounded-xl border border-purple-200 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-16 h-16">
+                                    <div className="absolute transform rotate-45 bg-purple-500 text-white text-xs py-1 right-[-40px] top-[20px] w-[170px] text-center">
+                                        RENTAL
+                                    </div>
+                                </div>
+                                <div className="flex items-center mb-4">
+                                    <Home size={24} className="text-purple-600 mr-2" />
+                                    <h3 className="font-medium text-purple-800 text-lg">Rental Information</h3>
+                                </div>
+                                <p className="text-purple-600 text-sm mb-2">You'll need to upload a rental agreement document in the Documents step.</p>
+                            </div>
+                        )}
                     </>
                 )}
 
@@ -347,6 +408,42 @@ export default function AddFamilyMember() {
 
                         {/* Conditional Document Fields */}
                         <div className="space-y-6">
+                            {isRental && (
+                                <div className="p-6 bg-purple-50 rounded-xl border border-purple-200">
+                                    <div className="flex items-center mb-4">
+                                        <FileCheck size={22} className="text-purple-600 mr-2" />
+                                        <h3 className="font-medium text-purple-800 text-lg">Rental Agreement Document *</h3>
+                                    </div>
+                                    <div className="relative">
+                                        <div className="border-2 border-dashed border-purple-300 rounded-lg p-4 text-center hover:border-purple-500 transition-colors duration-200">
+                                            <input
+                                                type="file"
+                                                name="memberTypeImage"
+                                                onChange={handleFileChange}
+                                                className="hidden"
+                                                id="rental-agreement"
+                                                accept=".pdf,.jpg,.jpeg,.png"
+                                            />
+                                            <label htmlFor="rental-agreement" className="cursor-pointer block py-2">
+                                                {isUploading ? (
+                                                    <div className="flex items-center justify-center">
+                                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600"></div>
+                                                        <span className="ml-2 text-purple-600">Uploading...</span>
+                                                    </div>
+                                                ) : fileNames.memberTypeImage ? (
+                                                    <div className="flex items-center justify-center text-purple-600">
+                                                        <FileCheck size={18} className="mr-1" />
+                                                        <span>{fileNames.memberTypeImage}</span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-sm text-purple-600">Upload rental agreement document</span>
+                                                )}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {isNewborn && (
                                 <div className="p-6 bg-blue-50 rounded-xl border border-blue-200">
                                     <div className="flex items-center mb-4">

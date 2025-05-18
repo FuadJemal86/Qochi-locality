@@ -73,6 +73,7 @@ model Member {
   isApproved          Status       @default(PENDING)
   headId              Int?
   memberType          HomeType
+  memberTypeImage     String?
   head                FamilyHead?  @relation("FamilyHeadMembers", fields: [headId], references: [id])
   idRestored          Boolean      @default(false)
   restorationDate     DateTime?
@@ -158,5 +159,4 @@ enum TypeRequest {
 
 enum HomeType {
   Rental
-  Member
 }

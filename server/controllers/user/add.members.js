@@ -8,7 +8,8 @@ const addMember = [
         { name: "birthCertificate", maxCount: 1 },
         { name: "image", maxCount: 1 },
         { name: "deathCertificate", maxCount: 1 },
-        { name: "marriageCertificate", maxCount: 1 }
+        { name: "marriageCertificate", maxCount: 1 },
+        { name: "memberTypeImage", maxCount: 1 }
     ]),
     async (req, res) => {
         const token = req.cookies['fh-auth-token'];
@@ -17,10 +18,12 @@ const addMember = [
             return res.status(400).json({ status: false, message: 'no token provided' });
         }
 
+        let headId
+
         try {
             // Decode the token
             const decoded = jwt.verify(token, process.env.USER_KEY);
-            const headId = decoded.id;
+            headId = decoded?.id;
 
             const {
                 fullName,
@@ -30,7 +33,7 @@ const addMember = [
                 education,
                 occupation,
                 status,
-                idExpiryDate
+                memberType
             } = req.body;
 
             if (!fullName || !birthDate || !relationship) {
@@ -47,9 +50,10 @@ const addMember = [
                 education,
                 occupation,
                 status,
-                idExpiryDate: idExpiryDate ? new Date(idExpiryDate) : null,
-                headId: parseInt(headId),
+                memberType: memberType === "Rental" || memberType === "Member" ? memberType : "Member", // Ensure valid enum value
+                headId: parseInt(headId)
             };
+
 
             // Handle file uploads - fix path handling
             if (req.files) {
@@ -64,6 +68,9 @@ const addMember = [
                 }
                 if (req.files.marriageCertificate && req.files.marriageCertificate.length > 0) {
                     memberData.marriageCertificate = req.files.marriageCertificate[0].filename;
+                }
+                if (req.files.memberTypeImage && req.files.memberTypeImage.length > 0) {
+                    memberData.memberTypeImage = req.files.memberTypeImage[0].filename;
                 }
             }
 

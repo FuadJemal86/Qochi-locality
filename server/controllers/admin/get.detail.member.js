@@ -16,7 +16,9 @@ const getDetailMember = async (req, res) => {
                 occupation: true,
                 image: true,
                 birthCertificate: true,
-                deathCertificate: true
+                deathCertificate: true,
+                marriageCertificate: true,
+                status: true
             }
         })
 

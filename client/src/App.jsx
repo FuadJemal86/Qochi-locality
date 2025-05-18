@@ -15,6 +15,7 @@ import EditFamilyMemeber from './components/user/userNav/EditFamilyMemeber';
 import RejectedFamilyMember from './components/admin/adminNav/RejectedFamilyMembers';
 import IdTable from './components/user/userNav/IdTable';
 import IDRequest from './components/user/userNav/IdRequest';
+import DetailMember from './components/admin/adminNav/DetailMember';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -30,6 +31,7 @@ function App() {
           <Route path='add-family-header' element={<AddFamilyHeader />} />
           <Route path='family-members' element={<AdminFmailyMembers />} />
           <Route path='rejected-family-member' element={<RejectedFamilyMember />} />
+          <Route path='get-detail-member/:id' element={<DetailMember />} />
         </Route>
 
         {/* family header Dashboard */}
@@ -40,7 +42,6 @@ function App() {
           <Route path='edit-family-member/:id' element={<EditFamilyMemeber />} />
           <Route path='id' element={<IdTable />} />
           <Route path='id-request/:id' element={<IDRequest />} />
-
         </Route>
       </Routes>
     </Router>

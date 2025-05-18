@@ -6,9 +6,9 @@ import { saveAs } from 'file-saver';
 import api from '../../../../api';
 import toast, { Toaster } from 'react-hot-toast';
 
-function AdminFmailyMembers() {
+function AdminFamilyMembers() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
-    const [detailMemberData, setDetailMemberData] = useState({})
+    const [detailMemberData, setDetailMemberData] = useState({});
     const [selectedFamilyId, setSelectedFamilyId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [familyHeadsData, setFamilyHeadsData] = useState([]);
@@ -16,7 +16,8 @@ function AdminFmailyMembers() {
     const [currentPage, setCurrentPage] = useState(1);
     const [statusState, setStatusState] = useState({
         status: ''
-    })
+    });
+    const [isLoading, setIsLoading] = useState(true);
     const itemsPerPage = 5;
 
     const getStatusBadgeColor = (status) => {
@@ -60,7 +61,6 @@ function AdminFmailyMembers() {
                 [id]: []
             }));
         }
-        setShowDetailsModal(true);
     };
 
     const handleEdit = (id) => {
@@ -88,6 +88,7 @@ function AdminFmailyMembers() {
     }, []);
 
     const fetchData = async () => {
+        setIsLoading(true);
         try {
             const result = await api.get('/admin/get-members');
             if (result.data.status) {
@@ -97,6 +98,8 @@ function AdminFmailyMembers() {
             }
         } catch (err) {
             console.error('Error fetching family headers:', err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -135,41 +138,32 @@ function AdminFmailyMembers() {
         saveAs(data, "Families.xlsx");
     };
 
-
-    const getMemeberdeatilData = async (id) => {
-        try {
-            const result = await api.get(`/admin/get-member-data/${id}`)
-
-            if (result.data.status) {
-                setDetailMemberData(result.data.getDetailMember)
-            } else {
-                console.log(result.data.message)
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }
-
+    const getMemberDetailData = async (id) => {
+        navigator(`/get-detail-member/${id}`)
+    };
 
     const handleApproval = async (value, id) => {
         try {
             const result = await api.put(`/admin/member-approval/${id}`, {
                 ...statusState,
                 status: value
-            })
+            });
 
             if (result.data.status) {
-                toast.success(result.data.message)
-                fetchData()
+                toast.success(result.data.message);
+                fetchData();
             } else {
-                console.log(result.data.message)
+                console.log(result.data.message);
+                toast.error(result.data.message || "Failed to update status");
             }
-
         } catch (err) {
-            console.log(err)
+            console.log(err);
+            toast.error("An error occurred while updating status");
         }
+    };
 
-    }
+
+
     return (
         <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
             <Toaster position="top-center" reverseOrder={false} />
@@ -177,15 +171,15 @@ function AdminFmailyMembers() {
                 <div className="flex justify-end mb-4 gap-2">
                     <button
                         onClick={handlePrint}
-                        className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                        className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-2"
                     >
-                        <Printer />
+                        <Printer size={16} /> Print
                     </button>
                     <button
                         onClick={exportToExcel}
-                        className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700"
+                        className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-2"
                     >
-                        <FileSpreadsheet />
+                        <FileSpreadsheet size={16} /> Export
                     </button>
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -222,7 +216,16 @@ function AdminFmailyMembers() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {currentItems.length > 0 ? (
+                                {isLoading ? (
+                                    <tr>
+                                        <td colSpan="8" className="py-8 text-center text-gray-500">
+                                            <div className="flex justify-center items-center">
+                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                                <span className="ml-3">Loading data...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : currentItems.length > 0 ? (
                                     currentItems.map((family) =>
                                         family.members.map((member) => (
                                             <tr key={`${family.id}-${member.id}`} className="hover:bg-gray-50 transition-colors duration-150">
@@ -265,7 +268,7 @@ function AdminFmailyMembers() {
                                                     <select
                                                         value={member.isApproved || "PENDING"}
                                                         onChange={e => handleApproval(e.target.value, member.id)}
-                                                        className={`px-2 py-1 rounded-full text-xs font-medium outline-none} ${getStatusBadgeColor(member.isApproved)}`}
+                                                        className={`px-2 py-1 rounded-full text-xs font-medium outline-none ${getStatusBadgeColor(member.isApproved)}`}
                                                     >
                                                         <option value="PENDING">PENDING</option>
                                                         <option value="APPROVED">APPROVED</option>
@@ -276,13 +279,12 @@ function AdminFmailyMembers() {
                                                 {/* Action Buttons */}
                                                 <td className="py-4 px-4 whitespace-nowrap">
                                                     <div className="flex space-x-2">
-                                                        <button
-                                                            onClick={() => handleViewDetails(member.id)}
+                                                        <Link to={`/admin-dashboard/get-detail-member/${member.id}`}
                                                             className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
                                                             title="View Details"
                                                         >
                                                             <Info size={18} />
-                                                        </button>
+                                                        </Link>
                                                         <button
                                                             onClick={() => handleEdit(member.id)}
                                                             className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
@@ -305,11 +307,10 @@ function AdminFmailyMembers() {
                                 ) : (
                                     <tr>
                                         <td colSpan="8" className="py-8 text-center text-gray-500">
-                                            {familyHeadsData.length === 0 ? "Loading data..." : "No families found matching your search."}
+                                            {familyHeadsData.length === 0 ? "No data available." : "No families found matching your search."}
                                         </td>
                                     </tr>
                                 )}
-
                             </tbody>
                         </table>
                     </div>
@@ -340,9 +341,8 @@ function AdminFmailyMembers() {
                     </div>
                 )}
             </div>
-
         </div>
     );
 }
 
-export default AdminFmailyMembers;
+export default AdminFamilyMembers;
