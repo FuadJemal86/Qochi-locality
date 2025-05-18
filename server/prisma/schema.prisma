@@ -72,8 +72,8 @@ model Member {
   isRemoved           Boolean      @default(false)
   isApproved          Status       @default(PENDING)
   headId              Int?
+  memberType          HomeType
   head                FamilyHead?  @relation("FamilyHeadMembers", fields: [headId], references: [id])
-  idExpiryDate        DateTime?
   idRestored          Boolean      @default(false)
   restorationDate     DateTime?
   restorationPayment  Float?
@@ -98,6 +98,7 @@ model IDRequest {
   Nationality      String
   emergencyContact String
   image            String?
+  gotImage         String?
   type             TypeRequest
   status           RequestStatus @default(PENDING)
   createdAt        DateTime      @default(now())
@@ -153,4 +154,9 @@ enum TypeRequest {
   New
   updated
   Expired
+}
+
+enum HomeType {
+  Rental
+  Member
 }

@@ -8,6 +8,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 function AdminFmailyMembers() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [detailMemberData, setDetailMemberData] = useState({})
     const [selectedFamilyId, setSelectedFamilyId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [familyHeadsData, setFamilyHeadsData] = useState([]);
@@ -134,6 +135,20 @@ function AdminFmailyMembers() {
         saveAs(data, "Families.xlsx");
     };
 
+
+    const getMemeberdeatilData = async (id) => {
+        try {
+            const result = await api.get(`/admin/get-member-data/${id}`)
+
+            if (result.data.status) {
+                setDetailMemberData(result.data.getDetailMember)
+            } else {
+                console.log(result.data.message)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
 
     const handleApproval = async (value, id) => {
@@ -326,63 +341,6 @@ function AdminFmailyMembers() {
                 )}
             </div>
 
-            {/* Details Modal */}
-            {showDetailsModal && selectedFamilyId && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-screen overflow-y-auto">
-                        <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200">
-                            <h2 className="text-xl font-bold text-gray-800">
-                                Family Members - {familyHeadsData.find(f => f.id === selectedFamilyId)?.fullName}
-                            </h2>
-                            <button
-                                onClick={() => setShowDetailsModal(false)}
-                                className="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors duration-200"
-                            >
-                                <X size={18} />
-                            </button>
-                        </div>
-
-                        <div className="p-4 md:p-6">
-                            <div className="rounded-lg border border-gray-200 overflow-hidden">
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
-                                            <tr>
-                                                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
-                                                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birth Date</th>
-                                                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relationship</th>
-                                                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Education</th>
-                                                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Occupation</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
-                                            {familyMembersData[selectedFamilyId]?.length > 0 ? (
-                                                familyMembersData[selectedFamilyId].map((member) => (
-                                                    <tr key={member.id} className="hover:bg-gray-50 transition-colors duration-150">
-                                                        <td className="py-4 px-4 whitespace-nowrap">{member.id}</td>
-                                                        <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.fullName}</td>
-                                                        <td className="py-4 px-4 whitespace-nowrap text-gray-700">{formatDate(member.birthDate)}</td>
-                                                        <td className="py-4 px-4 whitespace-nowrap text-gray-700">{member.relationship}</td>
-                                                        <td className="py-4 px-4 whitespace-nowrap text-gray-700">{member.education}</td>
-                                                        <td className="py-4 px-4 whitespace-nowrap text-gray-700">{member.occupation}</td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan="6" className="py-8 text-center text-gray-500">
-                                                        {!familyMembersData[selectedFamilyId] ? "Loading data..." : "No family members found."}
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
