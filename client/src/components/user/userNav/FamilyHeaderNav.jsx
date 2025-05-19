@@ -223,8 +223,8 @@ export default function FamilyHeaderNav() {
                                 <NavItem
                                     icon={<UserX className="h-5 w-5" />}
                                     label="Id"
-                                    id="id"
-                                    isActive={activeItem === 'id'}
+                                    id="Id Request"
+                                    isActive={activeItem === 'id request'}
                                     onClick={() => {
                                         setActiveItem('id');
                                         if (isMobile) setSidebarOpen(false);

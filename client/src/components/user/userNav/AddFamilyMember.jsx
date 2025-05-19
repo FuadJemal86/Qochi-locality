@@ -16,7 +16,7 @@ export default function AddFamilyMember() {
         education: "",
         occupation: "",
         status: "ACTIVE",
-        memberType: "Member", // Default value
+        memberType: "Member", // Default value to match backend expectation
     });
 
     // Store file objects separately
@@ -25,7 +25,7 @@ export default function AddFamilyMember() {
         image: null,
         deathCertificate: null,
         marriageCertificate: null,
-        memberTypeImage: null, // Added for rental agreement
+        memberTypeImage: null, // For rental agreement
     });
 
     // Store file names for display purposes
@@ -34,7 +34,7 @@ export default function AddFamilyMember() {
         image: "",
         deathCertificate: "",
         marriageCertificate: "",
-        memberTypeImage: "", // Added for rental agreement
+        memberTypeImage: "",
     });
 
     const [activeStep, setActiveStep] = useState(1);
@@ -44,7 +44,7 @@ export default function AddFamilyMember() {
     const isNewborn = formData.type === "NEWBORN";
     const isDeceased = formData.status === "DECEASED";
     const isMarried = formData.status === "MARRIED";
-    const isRental = formData.memberType === "RENTAL";
+    const isRental = formData.memberType === "Rental";
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -57,7 +57,7 @@ export default function AddFamilyMember() {
 
         setIsUploading(true);
 
-        // Simulate upload delay (in real app, you might want to remove this)
+        // Simulate upload delay (in real app, this could be removed)
         setTimeout(() => {
             if (file) {
                 // Store the file object for submission
@@ -77,10 +77,10 @@ export default function AddFamilyMember() {
     };
 
     const handleSubmit = async () => {
-        const { fullName, birthDate, relationship } = formData
+        const { fullName, birthDate, relationship } = formData;
 
         if (!fullName || !birthDate || !relationship) {
-            toast.error('Please fill the required input fields!')
+            toast.error('Please fill the required input fields!');
             return;
         }
 
@@ -117,10 +117,40 @@ export default function AddFamilyMember() {
                 Swal.fire({
                     position: "center",
                     icon: "success",
-                    title: "Your work has been saved",
+                    title: "Family member has been added successfully",
                     showConfirmButton: false,
                     timer: 1500
                 });
+
+                // Reset form after successful submission
+                setFormData({
+                    fullName: "",
+                    birthDate: "",
+                    type: "PERMANENT",
+                    relationship: "",
+                    education: "",
+                    occupation: "",
+                    status: "ACTIVE",
+                    memberType: "Member",
+                });
+
+                setFileData({
+                    birthCertificate: null,
+                    image: null,
+                    deathCertificate: null,
+                    marriageCertificate: null,
+                    memberTypeImage: null,
+                });
+
+                setFileNames({
+                    birthCertificate: "",
+                    image: "",
+                    deathCertificate: "",
+                    marriageCertificate: "",
+                    memberTypeImage: "",
+                });
+
+                setActiveStep(1);
             }
         } catch (err) {
             console.error(err);
@@ -136,8 +166,8 @@ export default function AddFamilyMember() {
     };
 
     const memberTypeColors = {
-        OWNER: { bg: "bg-indigo-100", text: "text-indigo-700", icon: <Home size={18} className="text-indigo-600" /> },
-        RENTAL: { bg: "bg-purple-100", text: "text-purple-700", icon: <Home size={18} className="text-purple-600" /> }
+        Member: { bg: "bg-blue-100", text: "text-blue-700", icon: <User size={18} className="text-blue-600" /> },
+        Rental: { bg: "bg-purple-100", text: "text-purple-700", icon: <Home size={18} className="text-purple-600" /> }
     };
 
     return (
@@ -271,19 +301,23 @@ export default function AddFamilyMember() {
                             <div>
                                 <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
                                     <Home size={16} className="mr-1 text-blue-500" />
-                                    Member Type *
+                                    Residence Type
                                 </label>
                                 <div className="grid grid-cols-2 gap-2">
-                                    {["RENTAL"].map(homeType => (
+                                    {["Member", "Rental"].map(resType => (
                                         <div
-                                            key={homeType}
-                                            onClick={() => setFormData(prev => ({ ...prev, memberType: homeType }))}
-                                            className={`cursor-pointer border rounded-lg px-4 py-3 flex items-center justify-center transition-all duration-200 ${formData.memberType === homeType
-                                                ? `${memberTypeColors[homeType].bg} border-${homeType === "OWNER" ? "indigo" : "purple"}-400 ${memberTypeColors[homeType].text}`
+                                            key={resType}
+                                            onClick={() => setFormData(prev => ({ ...prev, memberType: resType }))}
+                                            className={`cursor-pointer border rounded-lg px-4 py-3 flex items-center justify-center transition-all duration-200 ${formData.memberType === resType
+                                                ? `${memberTypeColors[resType].bg} border-${resType === "Member" ? "blue" : "purple"}-400 ${memberTypeColors[resType].text}`
                                                 : "border-gray-200 hover:bg-gray-50"
                                                 }`}
                                         >
-                                            <Home size={18} className="mr-2" /> {homeType === "OWNER" ? "Owner" : "Rental"}
+                                            {resType === "Member" ? (
+                                                <><User size={18} className="mr-2" /> Regular Member</>
+                                            ) : (
+                                                <><Home size={18} className="mr-2" /> Rental</>
+                                            )}
                                         </div>
                                     ))}
                                 </div>

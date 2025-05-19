@@ -21,7 +21,8 @@ import {
     CircleUser,
     ArrowRight,
     ArrowLeft,
-    Settings2
+    Settings2,
+    IdCard
 } from 'lucide-react';
 
 export default function AdminNav() {
@@ -85,11 +86,30 @@ export default function AdminNav() {
                     {icon}
                     {(!collapsed || isMobile) && <span className={`ml-3 font-medium ${isActive ? 'text-white' : 'group-hover:text-white'}`}>{label}</span>}
                 </div>
+                {hasDropdown && (!collapsed || isMobile) && (
+                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${activeDropdown === id ? 'rotate-180' : ''}`} />
+                )}
             </button>
         );
     };
 
-
+    // Submenu item component
+    const SubMenuItem = ({ icon, label, id, onClick, isActive }) => {
+        return (
+            <button
+                onClick={onClick}
+                className={`flex items-center w-full pl-12 pr-4 py-2 rounded-md transition-all duration-200 ${isActive
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-300 hover:bg-gray-800 hover:text-white focus:outline-none'
+                    }`}
+            >
+                <div className="flex items-center">
+                    {icon}
+                    {(!collapsed || isMobile) && <span className={`ml-3 font-medium ${isActive ? 'text-white' : 'group-hover:text-white'}`}>{label}</span>}
+                </div>
+            </button>
+        );
+    };
 
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
@@ -156,65 +176,92 @@ export default function AdminNav() {
                             </Link>
                         </li>
 
+                        {/* Members - with dropdown for sub-items */}
                         <li>
-                            <Link to={'/admin-dashboard/family-members'}>
+                            <div>
                                 <NavItem
                                     icon={<Users className="h-5 w-5" />}
                                     label="Members"
                                     id="members"
                                     hasDropdown={true}
-                                    isActive={activeItem === 'members'}
+                                    isActive={['members', 'new-members', 'removed-members', 'rejected-members'].includes(activeItem)}
                                     onClick={() => {
-                                        setActiveItem('members');
-                                        if (isMobile) setSidebarOpen(false);
+                                        toggleDropdown('members');
                                     }}
                                 />
-                            </Link>
+
+                                {/* Members Dropdown */}
+                                {(activeDropdown === 'members' && (!collapsed || isMobile)) && (
+                                    <div className="mt-1 space-y-1">
+                                        <Link to={'/admin-dashboard/family-members'}>
+                                            <SubMenuItem
+                                                icon={<UserCheck className="h-4 w-4" />}
+                                                label="All Members"
+                                                id="all-members"
+                                                isActive={activeItem === 'members'}
+                                                onClick={() => {
+                                                    setActiveItem('members');
+                                                    if (isMobile) setSidebarOpen(false);
+                                                }}
+                                            />
+                                        </Link>
+
+                                        <Link to={'/admin-dashboard/new-members'}>
+                                            <SubMenuItem
+                                                icon={<UserPlus className="h-4 w-4" />}
+                                                label="New Members"
+                                                id="new-members"
+                                                isActive={activeItem === 'new-members'}
+                                                onClick={() => {
+                                                    setActiveItem('new-members');
+                                                    if (isMobile) setSidebarOpen(false);
+                                                }}
+                                            />
+                                        </Link>
+
+                                        <Link to={'/admin-dashboard/removed-members'}>
+                                            <SubMenuItem
+                                                icon={<UserX className="h-4 w-4" />}
+                                                label="Removed Members"
+                                                id="removed-members"
+                                                isActive={activeItem === 'removed-members'}
+                                                onClick={() => {
+                                                    setActiveItem('removed-members');
+                                                    if (isMobile) setSidebarOpen(false);
+                                                }}
+                                            />
+                                        </Link>
+
+                                        <Link to={'/admin-dashboard/rejected-family-member'}>
+                                            <SubMenuItem
+                                                icon={<UserX className="h-4 w-4" />}
+                                                label="Rejected Members"
+                                                id="rejected-members"
+                                                isActive={activeItem === 'rejected-members'}
+                                                onClick={() => {
+                                                    setActiveItem('rejected-members');
+                                                    if (isMobile) setSidebarOpen(false);
+                                                }}
+                                            />
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
                         </li>
 
                         <li>
-                            <Link to={'/admin-dashboard/family-members'}>
+                            <Link to={'/admin-dashboard/id-Request'}>
                                 <NavItem
-                                    icon={<UserX className="h-5 w-5" />}
-                                    label="Removed members"
-                                    id="removed-members"
-                                    hasDropdown={true}
-                                    isActive={activeItem === 'removed-members'}
+                                    icon={<IdCard className="h-5 w-5" />}
+                                    label="Id Request"
+                                    id="id Request"
+                                    isActive={activeItem === 'id Request'}
                                     onClick={() => {
-                                        setActiveItem('removed-members');
+                                        setActiveItem('id Request');
                                         if (isMobile) setSidebarOpen(false);
                                     }}
                                 />
                             </Link>
-                        </li>
-
-                        <li>
-                            <Link to={'/admin-dashboard/rejected-family-member'}>
-                                <NavItem
-                                    icon={<UserX className="h-5 w-5" />}
-                                    label="Rejected Members"
-                                    id="rejected Members"
-                                    isActive={activeItem === 'rejected Members'}
-                                    onClick={() => {
-                                        setActiveItem('rejected Members');
-                                        if (isMobile) setSidebarOpen(false);
-                                    }}
-                                />
-                            </Link>
-                        </li>
-
-                        {/* Reports Section */}
-                        <li>
-                            <NavItem
-                                icon={<UserPlus className="h-5 w-5" />}
-                                label="New Members"
-                                id="new Members"
-                                isActive={activeItem === 'new Members'}
-                                onClick={() => {
-                                    setActiveItem('new Members');
-                                    if (isMobile) setSidebarOpen(false);
-                                }}
-                            />
                         </li>
 
                         <li>

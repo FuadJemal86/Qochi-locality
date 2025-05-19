@@ -233,10 +233,10 @@ function AdminFamilyMembers() {
                                                 <td className="py-4 px-4 whitespace-nowrap">{family.id}</td>
 
                                                 {/* Family Head Name */}
-                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{family.fullName || "No Family Name"}</td>
+                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.fullName || "No Family Name"}</td>
 
                                                 {/* Member Name */}
-                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.fullName || "No Member Name"}</td>
+                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{family.fullName || "No Member Name"}</td>
 
                                                 {/* Member Birth Date */}
                                                 <td className="p-3 text-sm text-gray-500">

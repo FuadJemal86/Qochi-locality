@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, Download, User, Calendar, Book, Briefcase, Heart, GraduationCap, FileText } from "lucide-react";
+import { X, Download, User, Calendar, Book, Briefcase, Heart, GraduationCap, FileText, Info, Map, Home } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../../../api";
 import { useNavigate, useParams } from "react-router-dom";
@@ -22,6 +22,10 @@ export default function DetailMember({ }) {
 
                 if (result.data.status) {
                     setDetailMemberData(result.data.getDetailMember);
+                    // Set timeout for the image to appear after data is loaded
+                    setTimeout(() => {
+                        setShowImage(true);
+                    }, 300);
                 } else {
                     console.log(result.data.message);
                     toast.error("Failed to fetch member details");
@@ -68,8 +72,134 @@ export default function DetailMember({ }) {
         navigator('/admin-dashboard/family-members')
     }
 
+    // Determine which tabs to show based on status
+    const renderTabs = () => {
+        const status = detailMemberData?.status?.toUpperCase();
+
+        return (
+            <div className="flex border-b pl-40 pr-6">
+                <button
+                    onClick={() => setActiveTab("info")}
+                    className={`px-6 py-4 font-medium transition-colors relative ${activeTab === "info"
+                        ? "text-blue-600"
+                        : "text-gray-500 hover:text-gray-700"
+                        }`}
+                >
+                    Personal Info
+                    {activeTab === "info" && (
+                        <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
+                    )}
+                </button>
+
+                <button
+                    onClick={() => setActiveTab("documents")}
+                    className={`px-6 py-4 font-medium transition-colors relative ${activeTab === "documents"
+                        ? "text-blue-600"
+                        : "text-gray-500 hover:text-gray-700"
+                        }`}
+                >
+                    Documents
+                    {activeTab === "documents" && (
+                        <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
+                    )}
+                </button>
+
+                {(status === "LEFT-LOCALITY") && (
+                    <button
+                        onClick={() => setActiveTab("locality")}
+                        className={`px-6 py-4 font-medium transition-colors relative ${activeTab === "locality"
+                            ? "text-blue-600"
+                            : "text-gray-500 hover:text-gray-700"
+                            }`}
+                    >
+                        Locality
+                        {activeTab === "locality" && (
+                            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
+                        )}
+                    </button>
+                )}
+            </div>
+        );
+    }
+
+    // Renders appropriate document based on status
+    const renderDocuments = () => {
+        const status = detailMemberData?.status?.toUpperCase();
+
+        if (status === "ACTIVE" || status === "MARRIED" || status === "LEFT-LOCALITY") {
+            // Only show birth certificate for ACTIVE, MARRIED, LEFT-LOCALITY
+            return (
+                <div className="grid grid-cols-1 gap-6">
+                    <DocumentCard
+                        title="Birth Certificate"
+                        document={detailMemberData?.birthCertificate}
+                    />
+                </div>
+            );
+        } else if (status === "DECEASED") {
+            // Show both birth and death certificate for DECEASED
+            return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <DocumentCard
+                        title="Birth Certificate"
+                        document={detailMemberData?.birthCertificate}
+                    />
+                    <DocumentCard
+                        title="Death Certificate"
+                        document={detailMemberData?.deathCertificate}
+                    />
+                </div>
+            );
+        } else {
+            // Default view if status is not specified
+            return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <DocumentCard
+                        title="Birth Certificate"
+                        document={detailMemberData?.birthCertificate}
+                    />
+                    <DocumentCard
+                        title="Death Certificate"
+                        document={detailMemberData?.deathCertificate}
+                    />
+                </div>
+            );
+        }
+    }
+
+    // Render locality information
+    const renderLocality = () => {
+        return (
+            <div className="space-y-6">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                    <h3 className="text-lg font-medium text-blue-800 mb-3 flex items-center gap-2">
+                        <Map className="text-blue-600" size={20} />
+                        Locality Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <InfoItem
+                            icon={<Home className="text-green-500" size={18} />}
+                            label="Current Locality"
+                            value={detailMemberData?.currentLocality || "Not available"}
+                        />
+                        <InfoItem
+                            icon={<Calendar className="text-blue-500" size={18} />}
+                            label="Date Left"
+                            value={detailMemberData?.dateLeft ? formatModalDate(detailMemberData.dateLeft) : "Not available"}
+                        />
+                        <InfoItem
+                            icon={<Info className="text-amber-500" size={18} />}
+                            label="Reason for Leaving"
+                            value={detailMemberData?.reasonForLeaving || "Not available"}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="fixed inset-0  bg-opacity-40 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-opacity-40 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all duration-300 ease-in-out">
                 {/* Header with gradient background */}
                 <div className="bg-gradient-to-r from-blue-500 to-purple-600 py-6 px-6 relative">
@@ -82,9 +212,11 @@ export default function DetailMember({ }) {
                             <X size={20} />
                         </button>
                     </div>
+                </div>
 
-                    {/* Member image - elevated above the header */}
-                    <div className={`absolute -bottom-16 left-6 transition-all duration-500 ease-in-out ${showImage ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+                {/* Member image - positioned correctly */}
+                <div className="relative z-10">
+                    <div className={`absolute -top-6 left-6 transition-all duration-500 ease-in-out ${showImage ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
                         {detailMemberData?.image ? (
                             <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
                                 <img
@@ -102,7 +234,7 @@ export default function DetailMember({ }) {
                 </div>
 
                 {/* Navigation tabs */}
-                <div className="flex border-b pl-40 pr-6">
+                <div className="flex border-b pl-40 pr-6 mt-4">
                     <button
                         onClick={() => setActiveTab("info")}
                         className={`px-6 py-4 font-medium transition-colors relative ${activeTab === "info"
@@ -115,6 +247,7 @@ export default function DetailMember({ }) {
                             <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
                         )}
                     </button>
+
                     <button
                         onClick={() => setActiveTab("documents")}
                         className={`px-6 py-4 font-medium transition-colors relative ${activeTab === "documents"
@@ -127,6 +260,21 @@ export default function DetailMember({ }) {
                             <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
                         )}
                     </button>
+
+                    {(detailMemberData?.status?.toUpperCase() === "LEFT-LOCALITY") && (
+                        <button
+                            onClick={() => setActiveTab("locality")}
+                            className={`px-6 py-4 font-medium transition-colors relative ${activeTab === "locality"
+                                ? "text-blue-600"
+                                : "text-gray-500 hover:text-gray-700"
+                                }`}
+                        >
+                            Locality
+                            {activeTab === "locality" && (
+                                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
+                            )}
+                        </button>
+                    )}
                 </div>
 
                 {/* Content area */}
@@ -140,6 +288,16 @@ export default function DetailMember({ }) {
                             {detailMemberData?.type || "Member"}
                             {detailMemberData?.relationship ? ` • ${detailMemberData.relationship}` : ""}
                         </p>
+                        <div className="mt-1">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${detailMemberData?.status?.toUpperCase() === "ACTIVE" ? "bg-green-100 text-green-800" :
+                                detailMemberData?.status?.toUpperCase() === "DECEASED" ? "bg-gray-100 text-gray-800" :
+                                    detailMemberData?.status?.toUpperCase() === "MARRIED" ? "bg-pink-100 text-pink-800" :
+                                        detailMemberData?.status?.toUpperCase() === "LEFT-LOCALITY" ? "bg-yellow-100 text-yellow-800" :
+                                            "bg-blue-100 text-blue-800"
+                                }`}>
+                                {detailMemberData?.status || "Unknown Status"}
+                            </span>
+                        </div>
                     </div>
 
                     {/* Tab content */}
@@ -171,21 +329,25 @@ export default function DetailMember({ }) {
                                     label="Type"
                                     value={detailMemberData?.type || "Not available"}
                                 />
+                                <InfoItem
+                                    icon={<Info className="text-amber-500" size={18} />}
+                                    label="Status"
+                                    value={detailMemberData?.status || "Not available"}
+                                />
+
+                                {detailMemberData?.status?.toUpperCase() === "DECEASED" && (
+                                    <InfoItem
+                                        icon={<Calendar className="text-gray-500" size={18} />}
+                                        label="Date of Death"
+                                        value={detailMemberData?.dateOfDeath ? formatModalDate(detailMemberData.dateOfDeath) : "Not available"}
+                                    />
+                                )}
                             </div>
                         )}
 
-                        {activeTab === "documents" && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <DocumentCard
-                                    title="Birth Certificate"
-                                    document={detailMemberData?.birthCertificate}
-                                />
-                                <DocumentCard
-                                    title="Death Certificate"
-                                    document={detailMemberData?.deathCertificate}
-                                />
-                            </div>
-                        )}
+                        {activeTab === "documents" && renderDocuments()}
+
+                        {activeTab === "locality" && renderLocality()}
                     </div>
                 </div>
 
