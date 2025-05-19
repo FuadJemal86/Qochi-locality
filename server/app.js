@@ -5,12 +5,13 @@ const adminRoute = require('./Router/adminRoute');
 const userRoute = require('./Router/userRoute');
 const fs = require("fs");
 const path = require("path");
-
 const app = express();
 const PORT = 3032;
 
+// Set the correct path to the uploads directory (outside the server directory)
+const membersDir = path.join(__dirname, "..", "uploads", "members");
+
 // Ensure the uploads directory exists
-const membersDir = path.join(__dirname, "uploads", "members");
 if (!fs.existsSync(membersDir)) {
     fs.mkdirSync(membersDir, { recursive: true });
     console.log(`Created directory: ${membersDir}`);
@@ -25,8 +26,8 @@ app.use(cors({
     credentials: true
 }));
 
-// Serve static files for image access
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve static files from the correct external directory
+app.use('/uploads', express.static(path.join(__dirname, "..", "uploads")));
 
 // Routes
 app.use('/admin', adminRoute);

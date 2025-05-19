@@ -18,7 +18,8 @@ const getDetailMember = async (req, res) => {
                 birthCertificate: true,
                 deathCertificate: true,
                 marriageCertificate: true,
-                status: true
+                status: true,
+                memberType: true
             }
         })
 
