@@ -16,6 +16,8 @@ import RejectedFamilyMember from './components/admin/adminNav/RejectedFamilyMemb
 import IdTable from './components/user/userNav/IdTable';
 import IDRequest from './components/user/userNav/IdRequest';
 import DetailMember from './components/admin/adminNav/DetailMember';
+import IdRequestT from './components/admin/adminNav/IdRequestT';
+import IdDetail from './components/admin/adminNav/IdDetail';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -32,6 +34,8 @@ function App() {
           <Route path='family-members' element={<AdminFmailyMembers />} />
           <Route path='rejected-family-member' element={<RejectedFamilyMember />} />
           <Route path='get-detail-member/:id' element={<DetailMember />} />
+          <Route path='id-request' element={<IdRequestT />} />
+          <Route path='get-detail-id/:id' element={<IdDetail />} />
         </Route>
 
         {/* family header Dashboard */}

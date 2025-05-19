@@ -250,7 +250,7 @@ export default function AdminNav() {
                         </li>
 
                         <li>
-                            <Link to={'/admin-dashboard/id-Request'}>
+                            <Link to={'/admin-dashboard/id-request'}>
                                 <NavItem
                                     icon={<IdCard className="h-5 w-5" />}
                                     label="Id Request"
