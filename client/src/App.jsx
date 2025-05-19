@@ -18,6 +18,7 @@ import IDRequest from './components/user/userNav/IdRequest';
 import DetailMember from './components/admin/adminNav/DetailMember';
 import IdRequestT from './components/admin/adminNav/IdRequestT';
 import IdDetail from './components/admin/adminNav/IdDetail';
+import Divorce from './components/user/certefiacte/Divorce';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -46,6 +47,7 @@ function App() {
           <Route path='edit-family-member/:id' element={<EditFamilyMemeber />} />
           <Route path='id' element={<IdTable />} />
           <Route path='id-request/:id' element={<IDRequest />} />
+          <Route path='birth-certificate' element={<Divorce />} />
         </Route>
       </Routes>
     </Router>

@@ -89,7 +89,7 @@ export default function IdDetail() {
             <div className="grid grid-cols-1 gap-6">
                 <DocumentCard
                     title="ID Request Document"
-                    document={requestData?.gotImage ? `http://localhost:3032/uploads/id-requests/${requestData.gotImage}` : null}
+                    document={requestData?.gotImage ? `http://localhost:3032/uploads/members/${requestData.gotImage}` : null}
                     documentType={requestData?.gotImage?.toLowerCase().endsWith('.pdf') ? "pdf" : "image"}
                 />
             </div>
@@ -122,7 +122,7 @@ export default function IdDetail() {
                                 {requestData?.image ? (
                                     <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
                                         <img
-                                            src={`http://localhost:3032/uploads/id-requests/${requestData.image}`}
+                                            src={`http://localhost:3032/uploads/members/${requestData.image}`}
                                             alt={requestData.fullName || "Applicant"}
                                             className="w-full h-full object-cover"
                                         />
@@ -256,25 +256,8 @@ export default function IdDetail() {
                 <div className="border-t p-4 bg-gray-50 flex justify-between flex-shrink-0">
                     {requestData?.status?.toUpperCase() === "PENDING" ? (
                         <>
-                            <button
-                                onClick={() => {
-                                    // Add your reject functionality here
-                                    toast.error("ID request rejected. This is a placeholder.");
-                                }}
-                                className="px-5 py-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition-colors"
-                            >
-                                Reject
-                            </button>
+
                             <div className="flex gap-3">
-                                <button
-                                    onClick={() => {
-                                        // Add your approve functionality here
-                                        toast.success("ID request approved. This is a placeholder.");
-                                    }}
-                                    className="px-5 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg transition-colors shadow-md"
-                                >
-                                    Approve
-                                </button>
                                 <button
                                     onClick={closeModal}
                                     className="px-5 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"

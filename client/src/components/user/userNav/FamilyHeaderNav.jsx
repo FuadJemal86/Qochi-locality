@@ -20,7 +20,8 @@ import {
     LogOut,
     CircleUser,
     ArrowRight,
-    ArrowLeft
+    ArrowLeft,
+    IdCard
 } from 'lucide-react';
 
 export default function FamilyHeaderNav() {
@@ -221,31 +222,17 @@ export default function FamilyHeaderNav() {
                         <li>
                             <Link to={'/family-head-dashboard/id'}>
                                 <NavItem
-                                    icon={<UserX className="h-5 w-5" />}
-                                    label="Id"
+                                    icon={<IdCard className="h-5 w-5" />}
+                                    label="Id Request"
                                     id="Id Request"
                                     isActive={activeItem === 'id request'}
                                     onClick={() => {
-                                        setActiveItem('id');
+                                        setActiveItem('id request');
                                         if (isMobile) setSidebarOpen(false);
                                     }}
                                 />
                             </Link>
                         </li>
-
-                        {/* Reports Section */}
-                        {/* <li>
-                            <NavItem
-                                icon={<UserPlus className="h-5 w-5" />}
-                                label="ID Request"
-                                id="id"
-                                isActive={activeItem === 'id'}
-                                onClick={() => {
-                                    setActiveItem('id');
-                                    if (isMobile) setSidebarOpen(false);
-                                }}
-                            />
-                        </li> */}
 
                         <li>
                             <NavItem

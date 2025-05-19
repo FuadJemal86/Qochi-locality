@@ -190,13 +190,6 @@ function FamilyHeaders() {
                                             <td className="py-4 px-4 whitespace-nowrap">
                                                 <div className="flex space-x-2">
                                                     <button
-                                                        onClick={() => handleViewDetails(family.id)}
-                                                        className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
-                                                        title="View Details"
-                                                    >
-                                                        <Info size={18} />
-                                                    </button>
-                                                    <button
                                                         onClick={() => handleEdit(family.id)}
                                                         className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
                                                         title="Edit"
