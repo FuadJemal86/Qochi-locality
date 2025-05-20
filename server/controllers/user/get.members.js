@@ -16,6 +16,10 @@ const getMembers = async (req, res) => {
             where: { headId: Number(headId) }
         })
 
+        if (!familyMembers) {
+            return res.status(400).json({ status: false, message: 'no family member founded' })
+        }
+
         return res.status(200).json({ status: true, familyMembers })
     } catch (err) {
         console.log(err)

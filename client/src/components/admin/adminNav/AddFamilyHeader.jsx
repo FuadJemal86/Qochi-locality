@@ -17,6 +17,7 @@ import {
     Building
 } from 'lucide-react';
 import api from '../../../../api';
+import Swal from 'sweetalert2';
 
 const AddFamilyHeader = () => {
     // Form refs
@@ -76,10 +77,8 @@ const AddFamilyHeader = () => {
         if (validateForm()) {
             setLoading(true);
 
-            // Create form data from form elements
             const formData = new FormData(formRef.current);
 
-            // Add the image if selected
             if (image) {
                 formData.append('image', image);
             }
@@ -94,21 +93,37 @@ const AddFamilyHeader = () => {
                     setPreviewImage(null);
                     setImage(null);
 
-                    // Reset success message after 5 seconds
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Family Head Added!',
+                        text: 'The family head was successfully added.',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+
                     setTimeout(() => {
                         setSuccess(false);
                     }, 5000);
                 } else {
                     setLoading(false);
-                    alert(response.data.message);
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Failed',
+                        text: response.data.message
+                    });
                 }
             } catch (error) {
                 console.error("Error submitting form:", error);
                 setLoading(false);
-                alert("Failed to add family head. Please try again.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: error.response.data.message || 'Failed to add family head. Please try again.'
+                });
             }
         }
     };
+
 
     // Clear error when input field is focused
     const handleFocus = (name) => {

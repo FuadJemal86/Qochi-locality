@@ -89,7 +89,7 @@ export default function Divorce() {
             const { status, message, data } = response.data;
 
             // Handle different status responses
-            if (status === "success") {
+            if (status === "success" || status === "PENDING") {
                 Swal.fire({
                     position: "center",
                     icon: "success",
@@ -140,7 +140,7 @@ export default function Divorce() {
                     showConfirmButton: false,
                     timer: 1500
                 });
-            } else {
+            } else if (status === "error") {
                 Swal.fire({
                     position: "center",
                     icon: "error",
@@ -148,8 +148,16 @@ export default function Divorce() {
                     showConfirmButton: false,
                     timer: 1500
                 });
+            } else {
+                // Fallback for any other status
+                Swal.fire({
+                    position: "center",
+                    icon: "info",
+                    title: message || "Request processed with status: " + status,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             }
-
         } catch (error) {
             console.error(error);
             Swal.fire({

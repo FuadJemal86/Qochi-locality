@@ -1,0 +1,81 @@
+import React, { useState } from 'react';
+import BirthCertificate from './BirthCertificate';
+import Death from './Death';
+import Marriage from './Marriage';
+import Divorce from './Divorce';
+import { FileText, BookX, Heart, Scissors } from 'lucide-react';
+
+function ParentCertificate() {
+    const [activeForm, setActiveForm] = useState('birth');
+
+    // Form rendering based on active selection
+    const renderForm = () => {
+        switch (activeForm) {
+            case 'birth':
+                return <BirthCertificate />;
+            case 'death':
+                return <Death />;
+            case 'marriage':
+                return <Marriage />;
+            case 'divorce':
+                return <Divorce />;
+            default:
+                return <BirthCertificate />;
+        }
+    };
+
+    // Button style helper function
+    const getButtonStyle = (formType) => {
+        return activeForm === formType
+            ? "bg-blue-600 text-white"
+            : "bg-gray-200 text-gray-700 hover:bg-gray-300";
+    };
+
+    return (
+        <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+            <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">Certificate Management</h1>
+
+            {/* Navigation Buttons */}
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+                <button
+                    onClick={() => setActiveForm('birth')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${getButtonStyle('birth')}`}
+                >
+                    <FileText size={18} />
+                    <span>Birth Certificate</span>
+                </button>
+
+                <button
+                    onClick={() => setActiveForm('death')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${getButtonStyle('death')}`}
+                >
+                    <BookX size={18} />
+                    <span>Death Certificate</span>
+                </button>
+
+                <button
+                    onClick={() => setActiveForm('marriage')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${getButtonStyle('marriage')}`}
+                >
+                    <Heart size={18} />
+                    <span>Marriage Certificate</span>
+                </button>
+
+                <button
+                    onClick={() => setActiveForm('divorce')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${getButtonStyle('divorce')}`}
+                >
+                    <Scissors size={18} />
+                    <span>Divorce Certificate</span>
+                </button>
+            </div>
+
+            {/* Card container for the form */}
+            <div className="border border-gray-300 rounded-lg p-6 bg-gray-50">
+                {renderForm()}
+            </div>
+        </div>
+    );
+}
+
+export default ParentCertificate;

@@ -21,7 +21,8 @@ import {
     CircleUser,
     ArrowRight,
     ArrowLeft,
-    IdCard
+    IdCard,
+    VideotapeIcon
 } from 'lucide-react';
 
 export default function FamilyHeaderNav() {
@@ -228,6 +229,21 @@ export default function FamilyHeaderNav() {
                                     isActive={activeItem === 'id request'}
                                     onClick={() => {
                                         setActiveItem('id request');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                />
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link to={'/family-head-dashboard/vital-event'}>
+                                <NavItem
+                                    icon={<VideotapeIcon className="h-5 w-5" />}
+                                    label="Vital Event"
+                                    id="Vital Event"
+                                    isActive={activeItem === 'Vital Event'}
+                                    onClick={() => {
+                                        setActiveItem('Vital Event');
                                         if (isMobile) setSidebarOpen(false);
                                     }}
                                 />
