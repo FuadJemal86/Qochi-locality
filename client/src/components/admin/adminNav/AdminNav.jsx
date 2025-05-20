@@ -22,7 +22,8 @@ import {
     ArrowRight,
     ArrowLeft,
     Settings2,
-    IdCard
+    IdCard,
+    Videotape
 } from 'lucide-react';
 
 export default function AdminNav() {
@@ -258,6 +259,21 @@ export default function AdminNav() {
                                     isActive={activeItem === 'id Request'}
                                     onClick={() => {
                                         setActiveItem('id Request');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                />
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link to={'/admin-dashboard/vital-event'}>
+                                <NavItem
+                                    icon={<Videotape className="h-5 w-5" />}
+                                    label="Vital Event"
+                                    id="Vital Event"
+                                    isActive={activeItem === 'Vital Event'}
+                                    onClick={() => {
+                                        setActiveItem('Vital Event');
                                         if (isMobile) setSidebarOpen(false);
                                     }}
                                 />

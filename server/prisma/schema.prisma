@@ -152,8 +152,8 @@ model BirthCertificate {
   status            RequestStatus @default(PENDING)
   familyHeadId      Int
   familyHead        FamilyHead    @relation(fields: [familyHeadId], references: [id])
-  memberId          Int
-  member            Member        @relation("MemberBirthCertificates", fields: [memberId], references: [id])
+  memberId          Int?
+  member            Member?       @relation("MemberBirthCertificates", fields: [memberId], references: [id])
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 }
@@ -169,8 +169,8 @@ model DeathCertificate {
   status       RequestStatus @default(PENDING)
   familyHeadId Int
   familyHead   FamilyHead    @relation(fields: [familyHeadId], references: [id])
-  memberId     Int
-  member       Member        @relation("MemberDeathCertificates", fields: [memberId], references: [id])
+  memberId     Int?
+  member       Member?       @relation("MemberDeathCertificates", fields: [memberId], references: [id])
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }

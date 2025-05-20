@@ -20,6 +20,7 @@ import IdRequestT from './components/admin/adminNav/IdRequestT';
 import IdDetail from './components/admin/adminNav/IdDetail';
 import VitalEvent from './components/user/userNav/VitalEvent';
 import ParentCerteficate from './components/user/certefiacte/ParentCerteficate';
+import VitalRequest from './components/admin/adminNav/VitalRequest';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -38,6 +39,7 @@ function App() {
           <Route path='get-detail-member/:id' element={<DetailMember />} />
           <Route path='id-request' element={<IdRequestT />} />
           <Route path='get-detail-id/:id' element={<IdDetail />} />
+          <Route path='vital-event' element={<VitalRequest />} />
         </Route>
 
         {/* family header Dashboard */}
