@@ -1,10 +1,10 @@
 const prisma = require("../../prismaClieynt")
 
 
-const getDetailIdInfo = async (req, res) => {
+const getBirthDetail = async (req, res) => {
     const { id } = req.params
     try {
-        const getDetailId = await prisma.iDRequest.findFirst({
+        const getDetailBirth = await prisma.birthCertificate.findFirst({
             where: { familyHeadId: Number(id) },
             include: {
                 familyHead: {
@@ -20,11 +20,11 @@ const getDetailIdInfo = async (req, res) => {
             }
         })
 
-        if (!getDetailId) {
-            return res.status(400).json({ status: false, message: 'no ID found in this id' })
+        if (!getDetailBirth) {
+            return res.status(400).json({ status: false, message: 'no birthCertificate found in this id' })
         }
 
-        return res.status(200).json({ status: true, getDetailId })
+        return res.status(200).json({ status: true, getDetailBirth })
 
     } catch (err) {
         console.log(err)
@@ -32,4 +32,4 @@ const getDetailIdInfo = async (req, res) => {
     }
 }
 
-module.exports = { getDetailIdInfo }
+module.exports = { getBirthDetail }

@@ -18,6 +18,9 @@ const { getDeathCertificate } = require('../controllers/admin/get.deathCerifi')
 const { deathCertificationApprove } = require('../controllers/admin/deathCertiApprove')
 const { getDivorceCertificate } = require('../controllers/admin/getDivorceReq')
 const { divorceCertificateApprove } = require('../controllers/admin/divorceApprov')
+const { getBirthDetail } = require('../controllers/admin/birthDetail')
+const uploadBirthCertification = require('../controllers/admin/uplodeBirthCertificate')
+const uploadIdDocument = require('../controllers/admin/uplodeIdDocument')
 
 const router = express.Router()
 
@@ -25,6 +28,9 @@ const router = express.Router()
 router.post('/login', adminLogin)
 router.post('/add-account', addAccount)
 router.post('/add-family-header', addFamilyHead)
+// upload documents
+router.post('/update-birth-document', uploadBirthCertification)
+router.post('/update-id-document', uploadIdDocument)
 
 router.get('/get-family-header', getFamilyHeader)
 router.get('/get-members', getMembers)
@@ -36,6 +42,9 @@ router.get('/get-birth-certificate', getBirthCertificate)
 router.get('/get-marriage-certificate', getMarriageCertification)
 router.get('/get-death-certificate', getDeathCertificate)
 router.get('/get-divorce-certificate', getDivorceCertificate)
+
+// certificate detail info
+router.get('/get-birth-detail/:id', getBirthDetail)
 
 
 router.put('/member-approval/:id', memeberApproved)

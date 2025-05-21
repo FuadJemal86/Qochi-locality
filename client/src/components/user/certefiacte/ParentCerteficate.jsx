@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BirthCertificate from './BirthCertificate';
 import Death from './Death';
 import Marriage from './Marriage';
@@ -7,10 +7,24 @@ import { FileText, BookX, Heart, Scissors } from 'lucide-react';
 
 function ParentCertificate() {
     const [activeForm, setActiveForm] = useState('birth');
+    const [displayForm, setDisplayForm] = useState('birth');
+    const [isTransitioning, setIsTransitioning] = useState(false);
+
+    // Handle form change with transition
+    useEffect(() => {
+        if (activeForm !== displayForm) {
+            setIsTransitioning(true);
+            const timer = setTimeout(() => {
+                setDisplayForm(activeForm);
+                setIsTransitioning(false);
+            }, 300); // Match this with CSS transition duration
+            return () => clearTimeout(timer);
+        }
+    }, [activeForm, displayForm]);
 
     // Form rendering based on active selection
     const renderForm = () => {
-        switch (activeForm) {
+        switch (displayForm) {
             case 'birth':
                 return <BirthCertificate />;
             case 'death':
@@ -70,9 +84,14 @@ function ParentCertificate() {
                 </button>
             </div>
 
-            {/* Card container for the form */}
+            {/* Card container for the form with transition effect */}
             <div className="border border-gray-300 rounded-lg p-6 bg-gray-50">
-                {renderForm()}
+                <div
+                    className={`transition-all duration-300 ${isTransitioning ? 'opacity-0 transform translate-y-4' : 'opacity-100 transform translate-y-0'
+                        }`}
+                >
+                    {renderForm()}
+                </div>
             </div>
         </div>
     );

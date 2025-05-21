@@ -213,11 +213,13 @@ function VitalEvent() {
                                                 </div>
                                                 <div>
                                                     <span className="font-semibold text-gray-600">Marriage:</span>{' '}
-                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${member.marriageCertificate
-                                                        ? getStatusBadgeColor("PENDING")
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${member.marriageCertificates && member.marriageCertificates.length > 0
+                                                        ? getStatusBadgeColor(member.marriageCertificates[0].status)
                                                         : "bg-gray-100 text-gray-500"
                                                         }`}>
-                                                        {member.marriageCertificate ? "PENDING" : "Not Required"}
+                                                        {member.marriageCertificates && member.marriageCertificates.length > 0
+                                                            ? member.marriageCertificates[0].status
+                                                            : "Not Required"}
                                                     </span>
                                                 </div>
                                             </td>

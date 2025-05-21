@@ -62,36 +62,34 @@ model LocalityAccount {
 }
 
 model Member {
-  id                  Int                   @id @default(autoincrement())
-  fullName            String
-  birthDate           DateTime
-  type                MemberType?
-  relationship        String?
-  education           String?
-  occupation          String?
-  status              MemberStatus          @default(ACTIVE)
-  birthCertificate    String?
-  image               String?
-  deathCertificate    String?
-  marriageCertificate String?
-  isRemoved           Boolean               @default(false)
-  isApproved          Status                @default(PENDING)
-  headId              Int?
-  memberType          HomeType?
-  memberTypeImage     String?
-  head                FamilyHead?           @relation("FamilyHeadMembers", fields: [headId], references: [id])
-  idRestored          Boolean               @default(false)
-  restorationDate     DateTime?
-  restorationPayment  Float?
-  idRequests          IDRequest[]
-  birthCertificates   BirthCertificate[]    @relation("MemberBirthCertificates")
-  deathCertificates   DeathCertificate[]    @relation("MemberDeathCertificates")
-  divorceCertificate  DivorceCertificate[]  @relation("MemberDivorceCertificate")
-  wifeMarriages       MarriageCertificate[] @relation("WifeMarriages")
-  husbandMarriages    MarriageCertificate[] @relation("HusbandMarriages")
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  certiAndId          certiAndId[]
+  id                   Int                   @id @default(autoincrement())
+  fullName             String
+  birthDate            DateTime
+  type                 MemberType?
+  relationship         String?
+  education            String?
+  occupation           String?
+  status               MemberStatus          @default(ACTIVE)
+  birthCertificate     String?
+  image                String?
+  deathCertificate     String?
+  marriageCertificate  String?
+  isRemoved            Boolean               @default(false)
+  isApproved           Status                @default(PENDING)
+  headId               Int?
+  memberType           HomeType?
+  memberTypeImage      String?
+  head                 FamilyHead?           @relation("FamilyHeadMembers", fields: [headId], references: [id])
+  idRestored           Boolean               @default(false)
+  restorationDate      DateTime?
+  restorationPayment   Float?
+  idRequests           IDRequest[]
+  birthCertificates    BirthCertificate[]    @relation("MemberBirthCertificates")
+  deathCertificates    DeathCertificate[]    @relation("MemberDeathCertificates")
+  divorceCertificate   DivorceCertificate[]  @relation("MemberDivorceCertificate")
+  marriageCertificates MarriageCertificate[] @relation("MemberMarriageCertificate")
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
 }
 
 model IDRequest {
@@ -179,8 +177,8 @@ model DivorceCertificate {
   id           Int        @id @default(autoincrement())
   familyHeadId Int
   familyHead   FamilyHead @relation(fields: [familyHeadId], references: [id])
-  memberId     Int
-  member       Member     @relation("MemberDivorceCertificate", fields: [memberId], references: [id])
+  memberId     Int?
+  member       Member?    @relation("MemberDivorceCertificate", fields: [memberId], references: [id])
 
   firstSpouseFullName     String
   firstSpouseBirthDate    DateTime
@@ -208,13 +206,11 @@ model MarriageCertificate {
 
   wifeFullName String
   wifeId       String
-  wifeMemberId Int?
-  wife         Member? @relation("WifeMarriages", fields: [wifeMemberId], references: [id])
+  memberId     Int?
+  member       Member? @relation("MemberMarriageCertificate", fields: [memberId], references: [id])
 
   husbandFullName String
   husbandId       String
-  husbandMemberId Int?
-  husband         Member? @relation("HusbandMarriages", fields: [husbandMemberId], references: [id])
 
   dateOfMarriage  DateTime
   placeOfMarriage String
@@ -239,11 +235,9 @@ model MarriageCertificate {
 
 model certiAndId {
   id           Int        @id @default(autoincrement())
-  memberId     Int
   familyHeadId Int
   document     String?
   familyHead   FamilyHead @relation(fields: [familyHeadId], references: [id])
-  Member       Member     @relation(fields: [memberId], references: [id])
 }
 
 enum MemberType {

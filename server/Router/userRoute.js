@@ -11,6 +11,7 @@ const { requestBirthCertificate } = require('../controllers/user/birthCerteficat
 const { requestDeathCertificate } = require('../controllers/user/deathCertificate')
 const { requestMarriageCertificate } = require('../controllers/user/marriageCertificate')
 const { requestDivorceCertificate } = require('../controllers/user/divorceCertificate')
+const { getAllDocuments } = require('../controllers/user/getAllDocumets')
 
 const router = express.Router()
 
@@ -29,6 +30,7 @@ router.get('/get-rejected-memeber', getMemberRejected)
 router.get('/get-edited-member', getEditedMember)
 router.get('/get-member-id', getMembersId)
 router.get('/get-vital-event', getVitalEvent)
+router.get('/get-all-documents', getAllDocuments)
 
 
 module.exports = router

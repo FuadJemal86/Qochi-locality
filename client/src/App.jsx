@@ -21,6 +21,8 @@ import IdDetail from './components/admin/adminNav/IdDetail';
 import VitalEvent from './components/user/userNav/VitalEvent';
 import ParentCerteficate from './components/user/certefiacte/ParentCerteficate';
 import VitalRequest from './components/admin/adminNav/VitalRequest';
+import BirthDetail from './components/admin/adminNav/BirthDetail';
+import Documents from './components/user/userNav/Documents';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -40,6 +42,8 @@ function App() {
           <Route path='id-request' element={<IdRequestT />} />
           <Route path='get-detail-id/:id' element={<IdDetail />} />
           <Route path='vital-event' element={<VitalRequest />} />
+          {/* certificate detail info */}
+          <Route path='birth-detail/:id' element={<BirthDetail />} />
         </Route>
 
         {/* family header Dashboard */}
@@ -52,6 +56,7 @@ function App() {
           <Route path='id-request/:id' element={<IDRequest />} />
           <Route path='certificate/:id' element={<ParentCerteficate />} />
           <Route path='vital-event' element={<VitalEvent />} />
+          <Route path='all-document' element={<Documents />} />
         </Route>
       </Routes>
     </Router>

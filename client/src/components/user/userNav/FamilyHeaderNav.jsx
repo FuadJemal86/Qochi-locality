@@ -22,7 +22,9 @@ import {
     ArrowRight,
     ArrowLeft,
     IdCard,
-    VideotapeIcon
+    VideotapeIcon,
+    File,
+    Folder
 } from 'lucide-react';
 
 export default function FamilyHeaderNav() {
@@ -244,6 +246,21 @@ export default function FamilyHeaderNav() {
                                     isActive={activeItem === 'Vital Event'}
                                     onClick={() => {
                                         setActiveItem('Vital Event');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                />
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link to={'/family-head-dashboard/all-document'}>
+                                <NavItem
+                                    icon={<Folder className="h-5 w-5" />}
+                                    label="Documents"
+                                    id="Documents"
+                                    isActive={activeItem === 'Documents'}
+                                    onClick={() => {
+                                        setActiveItem('Documents');
                                         if (isMobile) setSidebarOpen(false);
                                     }}
                                 />
