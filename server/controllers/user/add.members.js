@@ -33,15 +33,15 @@ const addMember = [
                 education,
                 occupation,
                 status,
-                memberType
+                memberType,
+                whoMember  // Added whoMember field from the request body
             } = req.body;
 
             if (!fullName || !birthDate || !relationship) {
                 return res.status(400).json({ status: false, message: 'please fill the input field' })
             }
 
-            // Log files received for debugging
-
+            // Create member data object with all fields including whoMember
             const memberData = {
                 fullName,
                 birthDate: new Date(birthDate),
@@ -51,11 +51,11 @@ const addMember = [
                 occupation,
                 status,
                 memberType: memberType === "Rental" || memberType === "Member" ? memberType : "Member", // Ensure valid enum value
-                headId: parseInt(headId)
+                headId: parseInt(headId),
+                whoMember: whoMember || null  // Add whoMember field, use null if not provided
             };
 
-
-            // Handle file uploads - fix path handling
+            // Handle file uploads
             if (req.files) {
                 if (req.files.birthCertificate && req.files.birthCertificate.length > 0) {
                     memberData.birthCertificate = req.files.birthCertificate[0].filename;
@@ -73,7 +73,6 @@ const addMember = [
                     memberData.memberTypeImage = req.files.memberTypeImage[0].filename;
                 }
             }
-
 
             // Save the member
             const newMember = await prisma.member.create({ data: memberData });

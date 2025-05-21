@@ -84,6 +84,7 @@ model Member {
   restorationDate      DateTime?
   restorationPayment   Float?
   idRequests           IDRequest[]
+  whoMember            WhoMember             @default(Child)
   birthCertificates    BirthCertificate[]    @relation("MemberBirthCertificates")
   deathCertificates    DeathCertificate[]    @relation("MemberDeathCertificates")
   divorceCertificate   DivorceCertificate[]  @relation("MemberDivorceCertificate")
@@ -286,4 +287,10 @@ enum CertificateStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum WhoMember {
+  Header
+  Wife
+  Child
 }

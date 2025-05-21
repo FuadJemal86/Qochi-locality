@@ -1,10 +1,16 @@
-
 import React, { useState } from "react";
-import { User, Calendar, Baby, FileCheck, Briefcase, GraduationCap, Heart, Frown, MapPin, Camera, Home } from "lucide-react";
+import { User, Calendar, Baby, FileCheck, Briefcase, GraduationCap, Heart, Frown, MapPin, Camera, Home, Users } from "lucide-react";
 import api from "../../../../api";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+
+// Added WhoMember enum
+const WhoMember = {
+    Header: "Header",
+    Wife: "Wife",
+    Child: "Child"
+};
 
 export default function AddFamilyMember() {
     const MySwal = withReactContent(Swal);
@@ -17,6 +23,7 @@ export default function AddFamilyMember() {
         occupation: "",
         status: "ACTIVE",
         memberType: "Member", // Default value to match backend expectation
+        whoMember: "", // Added whoMember field (optional)
     });
 
     // Store file objects separately
@@ -132,6 +139,7 @@ export default function AddFamilyMember() {
                     occupation: "",
                     status: "ACTIVE",
                     memberType: "Member",
+                    whoMember: "", // Reset whoMember field
                 });
 
                 setFileData({
@@ -168,6 +176,12 @@ export default function AddFamilyMember() {
     const memberTypeColors = {
         Member: { bg: "bg-blue-100", text: "text-blue-700", icon: <User size={18} className="text-blue-600" /> },
         Rental: { bg: "bg-purple-100", text: "text-purple-700", icon: <Home size={18} className="text-purple-600" /> }
+    };
+
+    const whoMemberColors = {
+        [WhoMember.Header]: { bg: "bg-indigo-100", text: "text-indigo-700", icon: <User size={18} className="text-indigo-600" /> },
+        [WhoMember.Wife]: { bg: "bg-pink-100", text: "text-pink-700", icon: <Heart size={18} className="text-pink-600" /> },
+        [WhoMember.Child]: { bg: "bg-cyan-100", text: "text-cyan-700", icon: <Baby size={18} className="text-cyan-600" /> }
     };
 
     return (
@@ -283,6 +297,27 @@ export default function AddFamilyMember() {
                                 </div>
                             </div>
 
+                            {/* Added Who Member Field */}
+                            <div>
+                                <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
+                                    <Users size={16} className="mr-1 text-blue-500" />
+                                    Member Role (Optional)
+                                </label>
+                                <select
+                                    name="whoMember"
+                                    value={formData.whoMember}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none bg-white"
+                                >
+                                    <option value="">Select Role (Optional)</option>
+                                    {Object.values(WhoMember).map(role => (
+                                        <option key={role} value={role}>
+                                            {role}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
                             <div>
                                 <label className="flex items-center text-sm font-medium text-gray-700 mb-1">
                                     <Heart size={16} className="mr-1 text-blue-500" />
@@ -339,6 +374,14 @@ export default function AddFamilyMember() {
                                 {memberTypeColors[formData.memberType].icon}
                                 <span className="ml-1">{formData.memberType}</span>
                             </div>
+
+                            {/* Added Who Member Badge (only if selected) */}
+                            {formData.whoMember && (
+                                <div className={`inline-flex items-center px-3 py-1 rounded-full ${whoMemberColors[formData.whoMember].bg} ${whoMemberColors[formData.whoMember].text} text-sm font-medium`}>
+                                    {whoMemberColors[formData.whoMember].icon}
+                                    <span className="ml-1">{formData.whoMember}</span>
+                                </div>
+                            )}
                         </div>
 
                         {!isNewborn && (
@@ -482,7 +525,7 @@ export default function AddFamilyMember() {
                                 <div className="p-6 bg-blue-50 rounded-xl border border-blue-200">
                                     <div className="flex items-center mb-4">
                                         <FileCheck size={22} className="text-blue-600 mr-2" />
-                                        <h3 className="font-medium text-blue-800 text-lg">Birth Certificate</h3>
+                                        <h3 className="font-medium text-blue-800 text-lg">Document(pdf)</h3>
                                     </div>
                                     <div className="relative">
                                         <div className="border-2 border-dashed border-blue-300 rounded-lg p-4 text-center hover:border-blue-500 transition-colors duration-200">
@@ -506,7 +549,7 @@ export default function AddFamilyMember() {
                                                         <span>{fileNames.birthCertificate}</span>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-sm text-blue-600">Upload birth certificate</span>
+                                                    <span className="text-sm text-blue-600">Upload Pdf</span>
                                                 )}
                                             </label>
                                         </div>

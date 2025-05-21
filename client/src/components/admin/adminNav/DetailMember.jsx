@@ -315,6 +315,11 @@ export default function DetailMember({ }) {
                                         label="Member Type"
                                         value={detailMemberData?.memberType || "Not available"}
                                     />
+                                    <InfoItem
+                                        icon={<Info className="text-amber-500" size={18} />}
+                                        label="Who is member"
+                                        value={detailMemberData?.whoMember || "Not available"}
+                                    />
 
                                     {detailMemberData?.status?.toUpperCase() === "DECEASED" && (
                                         <InfoItem

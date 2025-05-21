@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Edit, Trash, Info, UserPlus, X, Search, ChevronLeft, ChevronRight, Printer, FileSpreadsheet, User, LucideFileQuestion } from 'lucide-react';
+import { Edit, Trash, Info, UserPlus, X, Search, ChevronLeft, ChevronRight, Printer, FileSpreadsheet, User, LucideFileQuestion, Heart } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../../../../api';
@@ -13,6 +13,7 @@ function VitalEvent() {
     const [familyHeadsData, setFamilyHeadsData] = useState([]);
     const [familyMembersData, setFamilyMembersData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
+    const [showForYou, setShowForYou] = useState(false);
     const itemsPerPage = 5;
 
     const getStatusBadgeColor = (status) => {
@@ -33,11 +34,21 @@ function VitalEvent() {
         family.memberType?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // For You filter functionality
+    const forYouData = showForYou
+        ? filteredData.filter(member =>
+            (member.birthCertificates && member.birthCertificates.length > 0 && member.birthCertificates[0].status === 'PENDING') ||
+            (member.deathCertificates && member.deathCertificates.length > 0 && member.deathCertificates[0].status === 'PENDING') ||
+            (member.divorceCertificate && member.divorceCertificate.length > 0 && member.divorceCertificate[0].status === 'PENDING') ||
+            (member.marriageCertificates && member.marriageCertificates.length > 0 && member.marriageCertificates[0].status === 'PENDING')
+        )
+        : filteredData;
+
     // Pagination logic
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const currentItems = forYouData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(forYouData.length / itemsPerPage);
 
     const handleIdRequest = (id) => {
         navigate(`/family-head-dashboard/id-request/${id}`)
@@ -72,6 +83,11 @@ function VitalEvent() {
         };
         fetchData();
     }, []);
+
+    // Reset to first page when toggling For You mode
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [showForYou]);
 
     // print the customer table
     const handlePrint = () => {
@@ -116,15 +132,14 @@ function VitalEvent() {
                         onClick={handlePrint}
                         className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-1"
                     >
-                        <Printer size={18} />
-                        <span className="hidden sm:inline">Print</span>
+                        <Printer size={20} />
+
                     </button>
                     <button
                         onClick={exportToExcel}
                         className="px-4 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 flex items-center gap-1"
                     >
-                        <FileSpreadsheet size={18} />
-                        <span className="hidden sm:inline">Export</span>
+                        <FileSpreadsheet size={20} />
                     </button>
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -141,6 +156,17 @@ function VitalEvent() {
                             />
                             <Search size={18} className="absolute left-3 top-2.5 text-gray-400" />
                         </div>
+                        <Link
+                            to={'/family-head-dashboard/for-header'}
+                            onClick={() => setShowForYou(!showForYou)}
+                            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${showForYou
+                                ? "bg-purple-600 text-white hover:bg-purple-700"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                }`}
+                        >
+                            <Heart size={18} className={showForYou ? "text-white" : "text-purple-500"} />
+                            <span>For You</span>
+                        </Link>
                     </div>
                 </div>
 
@@ -240,7 +266,7 @@ function VitalEvent() {
                                 ) : (
                                     <tr>
                                         <td colSpan="7" className="py-8 text-center text-gray-500">
-                                            No family members found
+                                            {showForYou ? 'No pending vital events found' : 'No family members found'}
                                         </td>
                                     </tr>
                                 )}
@@ -249,10 +275,10 @@ function VitalEvent() {
                     </div>
                 </div>
                 {/* Pagination */}
-                {filteredData.length > itemsPerPage && (
+                {forYouData.length > itemsPerPage && (
                     <div className="flex justify-between items-center mt-4 px-2">
                         <span className="text-sm text-gray-600">
-                            Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} entries
+                            Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, forYouData.length)} of {forYouData.length} entries
                         </span>
                         <div className="flex space-x-2">
                             <button

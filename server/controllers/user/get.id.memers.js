@@ -13,7 +13,14 @@ const getMembersId = async (req, res) => {
         headId = decoded.id;
 
         const familyMembers = await prisma.member.findMany({
-            where: { headId: Number(headId) },
+            where: {
+                headId: Number(headId),
+                OR: [
+                    { isApproved: 'APPROVED' },
+                    { isApproved: 'REJECTED' },
+                ],
+            },
+
 
             include: {
                 idRequests: {

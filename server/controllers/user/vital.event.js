@@ -14,7 +14,12 @@ const getVitalEvent = async (req, res) => {
 
         // Get all members of the family head
         const members = await prisma.member.findMany({
-            where: { headId: Number(headId) },
+            where: {
+                headId: Number(headId), OR: [
+                    { isApproved: 'APPROVED' },
+                    { isApproved: 'REJECTED' },
+                ],
+            },
             include: {
                 birthCertificates: { select: { status: true } },
                 deathCertificates: { select: { status: true } },
