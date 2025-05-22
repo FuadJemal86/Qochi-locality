@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { X, Download, User, Calendar, Book, Briefcase, Heart, FileText, Info, Map, Home, Upload } from "lucide-react";
+import { X, Download, User, Calendar, Book, Briefcase, Heart, FileText, Info, Map, Home, Upload, Check, AlertCircle } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import api from "../../../../api";
 import { useNavigate, useParams } from "react-router-dom";
@@ -80,7 +80,7 @@ export default function IdDetail() {
 
             const formData = new FormData();
             formData.append("document", file);
-            formData.append("headId", id);
+            formData.append("id", id);
 
             const result = await api.post('/admin/update-id-document', formData, {
                 headers: {
@@ -152,112 +152,94 @@ export default function IdDetail() {
     const renderDocuments = () => {
         return (
             <div className="grid grid-cols-1 gap-6">
-                <Toaster position="top-center" reverseOrder={false} />
                 <DocumentCard
                     title="ID Request Document"
                     document={requestData?.gotImage ? `http://localhost:3032/uploads/members/${requestData.gotImage}` : null}
                     documentType={requestData?.gotImage?.toLowerCase().endsWith('.pdf') ? "pdf" : "image"}
                 />
+            </div>
+        );
+    };
 
-                {/* File Upload Section */}
-                <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                    <div className="bg-gray-50 py-3 px-4 border-b">
-                        <p className="font-medium text-gray-700 flex items-center gap-2">
-                            <Upload size={16} className="text-blue-500" />
-                            Upload Id Document
-                        </p>
-                    </div>
+    // Function to render the upload tab
+    const renderUpload = () => {
+        return (
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Upload ID Document</h3>
 
-                    <div className="p-4">
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="flex flex-col space-y-2">
-                                <div
-                                    className={`border-2 border-dashed rounded-lg p-4 transition-colors
-                                    ${filePreview ? 'border-blue-300 bg-blue-50' : 'border-gray-300 hover:border-blue-400'}
-                                    ${uploading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}
-                                    flex flex-col items-center justify-center h-40`}
-                                    onClick={() => !uploading && fileInputRef.current.click()}
-                                >
-                                    {filePreview ? (
-                                        <div className="relative w-full h-full flex items-center justify-center">
-                                            {file.type.startsWith('image/') ? (
-                                                <img src={filePreview} alt="Preview" className="max-h-32 max-w-full object-contain" />
-                                            ) : (
-                                                <div className="flex flex-col items-center justify-center">
-                                                    <div className="w-16 h-20 bg-blue-50 flex items-center justify-center rounded">
-                                                        <FileText size={24} className="text-blue-500" />
-                                                    </div>
-                                                    <p className="mt-2 text-sm font-medium text-gray-700">{file.name}</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <>
-                                            <Upload size={32} className="text-blue-500 mb-2" />
-                                            <p className="text-sm text-gray-600 text-center">
-                                                Click to select or drag and drop a file
-                                                <br />
-                                                <span className="text-xs text-gray-500">(PDF, PNG, JPG accepted)</span>
-                                            </p>
-                                        </>
-                                    )}
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        onChange={handleFileChange}
-                                        accept=".pdf,.png,.jpg,.jpeg"
-                                        className="hidden"
-                                        disabled={uploading}
-                                    />
-                                </div>
-                                {file && (
-                                    <div className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
-                                        <span className="text-sm truncate max-w-[200px]">{file.name}</span>
-                                        <button
-                                            type="button"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setFile(null);
-                                                setFilePreview(null);
-                                            }}
-                                            className="text-gray-500 hover:text-red-500"
-                                            disabled={uploading}
-                                        >
-                                            <X size={16} />
-                                        </button>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                            Document File (PDF or Image)
+                        </label>
+
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer text-center">
+                            <input
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                onChange={handleFileChange}
+                                className="hidden"
+                                id="document-upload"
+                                disabled={uploading}
+                                ref={fileInputRef}
+                            />
+
+                            <label htmlFor="document-upload" className="cursor-pointer">
+                                {!file ? (
+                                    <div className="space-y-2">
+                                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                                        <p className="text-gray-600">Click to upload or drag and drop</p>
+                                        <p className="text-sm text-gray-500">PDF, JPG, PNG (Max 10MB)</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {filePreview ? (
+                                            <img src={filePreview} alt="Preview" className="mx-auto h-32 object-contain" />
+                                        ) : (
+                                            <div className="mx-auto h-16 w-16 bg-blue-50 rounded-lg flex items-center justify-center">
+                                                <FileText className="h-8 w-8 text-blue-500" />
+                                            </div>
+                                        )}
+                                        <p className="text-sm text-gray-600 font-medium">{file.name}</p>
+                                        <p className="text-xs text-gray-500">
+                                            {(file.size / 1024 / 1024).toFixed(2)} MB • Click to change
+                                        </p>
                                     </div>
                                 )}
-                            </div>
-
-                            <div className="flex justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={!file || uploading}
-                                    className={`px-4 py-2 rounded-lg transition-colors
-                                    ${!file || uploading
-                                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                            : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
-                                        }`}
-                                >
-                                    {uploading ? (
-                                        <div className="flex items-center space-x-2">
-                                            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
-                                            <span>Uploading...</span>
-                                        </div>
-                                    ) : (
-                                        'Upload Document'
-                                    )}
-                                </button>
-                            </div>
-                        </form>
+                            </label>
+                        </div>
                     </div>
-                </div>
+
+                    <div className="flex justify-end">
+                        <button
+                            type="submit"
+                            disabled={!file || uploading}
+                            className={`px-4 py-2 rounded-md flex items-center gap-2 ${!file || uploading
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-blue-600 text-white hover:bg-blue-700"
+                                }`}
+                        >
+                            {uploading ? (
+                                <>
+                                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                                    <span>Uploading...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Check size={18} />
+                                    <span>Upload Document</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </form>
             </div>
         );
     };
 
     return (
         <div className="fixed inset-0 bg-opacity-40 flex items-center justify-center z-50 p-0 sm:p-4 backdrop-blur-sm overflow-y-auto">
+            <Toaster position="top-center" reverseOrder={false} />
             <div className="bg-white rounded-xl shadow-2xl w-full sm:max-w-3xl transform transition-all duration-300 ease-in-out my-0 sm:my-8 max-h-full sm:max-h-[90vh] flex flex-col">
                 {/* Header with gradient background */}
                 <div className="bg-gradient-to-r from-blue-500 to-purple-600 py-4 sm:py-6 px-4 sm:px-6 relative flex-shrink-0">
@@ -328,6 +310,16 @@ export default function IdDetail() {
                             >
                                 Documents
                                 {activeTab === "documents" && (
+                                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
+                                )}
+                            </button>
+
+                            <button
+                                onClick={() => setActiveTab("upload")}
+                                className={`px-4 sm:px-6 py-3 font-medium transition-colors relative whitespace-nowrap ${activeTab === "upload" ? "text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+                            >
+                                Upload Document
+                                {activeTab === "upload" && (
                                     <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
                                 )}
                             </button>
@@ -408,6 +400,8 @@ export default function IdDetail() {
                             )}
 
                             {activeTab === "documents" && renderDocuments()}
+
+                            {activeTab === "upload" && renderUpload()}
                         </div>
                     </div>
                 </div>

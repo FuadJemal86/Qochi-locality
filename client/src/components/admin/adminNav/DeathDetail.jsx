@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { X, Download, User, Calendar, Book, Briefcase, Heart, GraduationCap, FileText, Info, Map, Home, Upload, Check, AlertCircle } from "lucide-react";
+import { X, Download, User, Calendar, Book, Briefcase, Heart, GraduationCap, FileText, Info, Map, Home, Upload, Check, AlertCircle, Skull } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import api from "../../../../api";
 import { useNavigate, useParams } from "react-router-dom";
 
-export default function BirthDetail() {
+export default function DeathDetail() {
     const navigate = useNavigate();
     const { id } = useParams();
     const [activeTab, setActiveTab] = useState("info");
     const [showImage, setShowImage] = useState(false);
-    const [detailBirthData, setDetailBirthData] = useState({});
+    const [detailDeathData, setDetailDeathData] = useState({});
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [file, setFile] = useState(null);
@@ -19,20 +19,20 @@ export default function BirthDetail() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const result = await api.get(`/admin/get-birth-detail/${id}`);
+                const result = await api.get(`/admin/get-death-detail/${id}`);
 
                 if (result.data.status) {
-                    setDetailBirthData(result.data.getDetailBirth);
+                    setDetailDeathData(result.data.getDetailDeath);
                     setTimeout(() => {
                         setShowImage(true);
                     }, 300);
                 } else {
                     console.log(result.data.message);
-                    toast.error("Failed to fetch birth certificate details");
+                    toast.error("Failed to fetch death certificate details");
                 }
             } catch (err) {
                 console.log(err);
-                toast.error("An error occurred while fetching birth certificate details");
+                toast.error("An error occurred while fetching death certificate details");
             } finally {
                 setLoading(false);
             }
@@ -78,7 +78,7 @@ export default function BirthDetail() {
             formData.append("document", file);
             formData.append("id", id);
 
-            const result = await api.post('/admin/update-birth-document', formData, {
+            const result = await api.post('/admin/update-death-document', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -86,12 +86,11 @@ export default function BirthDetail() {
 
             if (result.data.status) {
                 toast.success("Document uploaded successfully");
-                // Refresh data
-                const updatedData = await api.get(`/admin/get-birth-detail/${id}`);
+
+                const updatedData = await api.get(`/admin/get-death-detail/${id}`);
                 if (updatedData.data.status) {
-                    setDetailBirthData(updatedData.data.getDetailBirth);
+                    setDetailDeathData(updatedData.data.getDetailDeath);
                 }
-                // Reset form
                 setFile(null);
                 setFilePreview(null);
             } else {
@@ -122,8 +121,8 @@ export default function BirthDetail() {
             <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
                 <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden">
                     <div className="p-8 sm:p-16 flex flex-col items-center justify-center">
-                        <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-blue-600"></div>
-                        <p className="mt-6 text-gray-600 font-medium">Loading birth certificate details...</p>
+                        <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-t-4 border-b-4 border-gray-600"></div>
+                        <p className="mt-6 text-gray-600 font-medium">Loading death certificate details...</p>
                     </div>
                 </div>
             </div>
@@ -136,15 +135,15 @@ export default function BirthDetail() {
 
     // Display document if available
     const renderDocument = () => {
-        const documentUrl = detailBirthData?.document ?
-            `http://localhost:3032/uploads/members/${detailBirthData.document}` : null;
+        const documentUrl = detailDeathData?.document ?
+            `http://localhost:3032/uploads/members/${detailDeathData.document}` : null;
 
         const isPDF = documentUrl && documentUrl.toLowerCase().endsWith('.pdf');
 
         return (
             <div className="grid grid-cols-1 gap-6">
                 <DocumentCard
-                    title="Birth Certificate Document"
+                    title="Death Certificate Document"
                     document={documentUrl}
                     documentType={isPDF ? "pdf" : "image"}
                 />
@@ -185,9 +184,9 @@ export default function BirthDetail() {
             <Toaster position="top-center" reverseOrder={false} />
             <div className="bg-white rounded-xl shadow-2xl w-full sm:max-w-3xl transform transition-all duration-300 ease-in-out my-0 sm:my-8 max-h-full sm:max-h-[90vh] flex flex-col">
                 {/* Header with gradient background */}
-                <div className="bg-gradient-to-r from-blue-500 to-purple-600 py-4 sm:py-6 px-4 sm:px-6 relative flex-shrink-0">
+                <div className="bg-gradient-to-r from-gray-700 to-gray-800 py-4 sm:py-6 px-4 sm:px-6 relative flex-shrink-0">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-xl sm:text-2xl font-bold text-white">Birth Certificate Details</h2>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white">Death Certificate Details</h2>
                         <button
                             onClick={closeModal}
                             className="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors text-white"
@@ -203,21 +202,21 @@ export default function BirthDetail() {
                     <div className="relative">
                         <div className="flex flex-col sm:flex-row items-center sm:items-start px-4 sm:px-6 pt-6 pb-2">
                             <div className={`transition-all duration-500 ease-in-out ${showImage ? "opacity-100" : "opacity-0"}`}>
-                                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-blue-100 flex items-center justify-center border-4 border-white shadow-lg">
-                                    <FileText size={40} className="text-blue-400" />
+                                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gray-100 flex items-center justify-center border-4 border-white shadow-lg">
+                                    <Skull size={40} className="text-gray-600" />
                                 </div>
                             </div>
 
                             <div className="mt-4 sm:mt-0 sm:ml-4 text-center sm:text-left">
                                 <h3 className="text-xl sm:text-2xl font-bold text-gray-800">
-                                    {detailBirthData?.fullName || "Unnamed"}
+                                    {detailDeathData?.fullName || "Death Certificate"}
                                 </h3>
                                 <p className="text-gray-500">
-                                    Birth Certificate
-                                    {detailBirthData?.member?.type ? ` • ${detailBirthData.member.type}` : ""}
+                                    Death Certificate
+                                    {detailDeathData?.member?.type ? ` • ${detailDeathData.member.type}` : ""}
                                 </p>
                                 <div className="mt-1">
-                                    {getStatusBadge(detailBirthData?.status)}
+                                    {getStatusBadge(detailDeathData?.status)}
                                 </div>
                             </div>
                         </div>
@@ -226,31 +225,31 @@ export default function BirthDetail() {
                         <div className="flex overflow-x-auto border-b mt-4 px-4 sm:px-6 no-scrollbar">
                             <button
                                 onClick={() => setActiveTab("info")}
-                                className={`px-4 sm:px-6 py-3 font-medium transition-colors relative whitespace-nowrap ${activeTab === "info" ? "text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+                                className={`px-4 sm:px-6 py-3 font-medium transition-colors relative whitespace-nowrap ${activeTab === "info" ? "text-gray-700" : "text-gray-500 hover:text-gray-700"}`}
                             >
-                                Personal Info
+                                Death Info
                                 {activeTab === "info" && (
-                                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
+                                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gray-700"></span>
                                 )}
                             </button>
 
                             <button
                                 onClick={() => setActiveTab("documents")}
-                                className={`px-4 sm:px-6 py-3 font-medium transition-colors relative whitespace-nowrap ${activeTab === "documents" ? "text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+                                className={`px-4 sm:px-6 py-3 font-medium transition-colors relative whitespace-nowrap ${activeTab === "documents" ? "text-gray-700" : "text-gray-500 hover:text-gray-700"}`}
                             >
                                 Documents
                                 {activeTab === "documents" && (
-                                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
+                                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gray-700"></span>
                                 )}
                             </button>
 
                             <button
                                 onClick={() => setActiveTab("upload")}
-                                className={`px-4 sm:px-6 py-3 font-medium transition-colors relative whitespace-nowrap ${activeTab === "upload" ? "text-blue-600" : "text-gray-500 hover:text-gray-700"}`}
+                                className={`px-4 sm:px-6 py-3 font-medium transition-colors relative whitespace-nowrap ${activeTab === "upload" ? "text-gray-700" : "text-gray-500 hover:text-gray-700"}`}
                             >
                                 Upload Document
                                 {activeTab === "upload" && (
-                                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600"></span>
+                                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gray-700"></span>
                                 )}
                             </button>
                         </div>
@@ -262,94 +261,54 @@ export default function BirthDetail() {
                             {activeTab === "info" && (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                                     <InfoItem
-                                        icon={<User className="text-blue-500" size={18} />}
+                                        icon={<User className="text-gray-600" size={18} />}
                                         label="Full Name"
-                                        value={detailBirthData?.fullName || "Not available"}
-                                    />
-                                    <InfoItem
-                                        icon={<Info className="text-purple-500" size={18} />}
-                                        label="Gender"
-                                        value={detailBirthData?.gender || "Not available"}
+                                        value={detailDeathData?.fullName || "Not available"}
                                     />
                                     <InfoItem
                                         icon={<Calendar className="text-blue-500" size={18} />}
                                         label="Date of Birth"
-                                        value={detailBirthData?.dateOfBirth ? formatDate(detailBirthData.dateOfBirth) : "Not available"}
+                                        value={detailDeathData?.dateOfBirth ? formatDate(detailDeathData.dateOfBirth) : "Not available"}
+                                    />
+                                    <InfoItem
+                                        icon={<Calendar className="text-red-500" size={18} />}
+                                        label="Date of Death"
+                                        value={detailDeathData?.dateOfDeath ? formatDate(detailDeathData.dateOfDeath) : "Not available"}
                                     />
                                     <InfoItem
                                         icon={<Map className="text-green-500" size={18} />}
-                                        label="Place of Birth"
-                                        value={detailBirthData?.placeOfBirth || "Not available"}
+                                        label="Place of Death"
+                                        value={detailDeathData?.placeOfDeath || "Not available"}
                                     />
                                     <InfoItem
-                                        icon={<Info className="text-amber-500" size={18} />}
+                                        icon={<Map className="text-purple-500" size={18} />}
                                         label="Nationality"
-                                        value={detailBirthData?.nationality || "Not available"}
-                                    />
-                                    <InfoItem
-                                        icon={<Map className="text-red-500" size={18} />}
-                                        label="Country"
-                                        value={detailBirthData?.country || "Not available"}
-                                    />
-                                    <InfoItem
-                                        icon={<Map className="text-indigo-500" size={18} />}
-                                        label="Region"
-                                        value={detailBirthData?.region || "Not available"}
-                                    />
-                                    <InfoItem
-                                        icon={<Map className="text-teal-500" size={18} />}
-                                        label="Zone"
-                                        value={detailBirthData?.zone || "Not available"}
-                                    />
-                                    <InfoItem
-                                        icon={<Map className="text-blue-400" size={18} />}
-                                        label="Woreda"
-                                        value={detailBirthData?.woreda || "Not available"}
-                                    />
-                                    <InfoItem
-                                        icon={<User className="text-blue-600" size={18} />}
-                                        label="Father's Full Name"
-                                        value={detailBirthData?.fatherFullName || "Not available"}
-                                    />
-                                    <InfoItem
-                                        icon={<Info className="text-amber-500" size={18} />}
-                                        label="Father's Nationality"
-                                        value={detailBirthData?.fatherNationality || "Not available"}
-                                    />
-                                    <InfoItem
-                                        icon={<FileText className="text-gray-500" size={18} />}
-                                        label="Father's ID"
-                                        value={detailBirthData?.fatherId || "Not available"}
-                                    />
-                                    <InfoItem
-                                        icon={<User className="text-pink-500" size={18} />}
-                                        label="Mother's Full Name"
-                                        value={detailBirthData?.motherFullName || "Not available"}
-                                    />
-                                    <InfoItem
-                                        icon={<Info className="text-amber-500" size={18} />}
-                                        label="Mother's Nationality"
-                                        value={detailBirthData?.motherNationality || "Not available"}
-                                    />
-                                    <InfoItem
-                                        icon={<FileText className="text-gray-500" size={18} />}
-                                        label="Mother's ID"
-                                        value={detailBirthData?.motherId || "Not available"}
+                                        value={detailDeathData?.nationality || "Not available"}
                                     />
                                     <InfoItem
                                         icon={<User className="text-green-500" size={18} />}
                                         label="Family Head"
-                                        value={detailBirthData?.familyHead?.fullName || "Not available"}
+                                        value={detailDeathData?.familyHead?.fullName || "Not available"}
+                                    />
+                                    <InfoItem
+                                        icon={<FileText className="text-indigo-500" size={18} />}
+                                        label="Member Type"
+                                        value={detailDeathData?.member?.type || "Not available"}
                                     />
                                     <InfoItem
                                         icon={<Calendar className="text-gray-500" size={18} />}
                                         label="Submission Date"
-                                        value={detailBirthData?.createdAt ? formatDate(detailBirthData.createdAt) : "Not available"}
+                                        value={detailDeathData?.createdAt ? formatDate(detailDeathData.createdAt) : "Not available"}
+                                    />
+                                    <InfoItem
+                                        icon={<Calendar className="text-gray-400" size={18} />}
+                                        label="Last Updated"
+                                        value={detailDeathData?.updatedAt ? formatDate(detailDeathData.updatedAt) : "Not available"}
                                     />
                                     <InfoItem
                                         icon={<AlertCircle className="text-amber-500" size={18} />}
                                         label="Status"
-                                        value={detailBirthData?.status || "Not available"}
+                                        value={detailDeathData?.status || "Not available"}
                                     />
                                 </div>
                             )}
@@ -358,7 +317,7 @@ export default function BirthDetail() {
 
                             {activeTab === "upload" && (
                                 <div className="bg-white p-4 rounded-lg border border-gray-200">
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Upload Birth Certificate Document</h3>
+                                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Upload Death Certificate Document</h3>
 
                                     <form onSubmit={handleSubmit} className="space-y-6">
                                         <div className="space-y-2">
@@ -388,8 +347,8 @@ export default function BirthDetail() {
                                                             {filePreview ? (
                                                                 <img src={filePreview} alt="Preview" className="mx-auto h-32 object-contain" />
                                                             ) : (
-                                                                <div className="mx-auto h-16 w-16 bg-blue-50 rounded-lg flex items-center justify-center">
-                                                                    <FileText className="h-8 w-8 text-blue-500" />
+                                                                <div className="mx-auto h-16 w-16 bg-gray-50 rounded-lg flex items-center justify-center">
+                                                                    <FileText className="h-8 w-8 text-gray-500" />
                                                                 </div>
                                                             )}
                                                             <p className="text-sm text-gray-600 font-medium">{file.name}</p>
@@ -408,7 +367,7 @@ export default function BirthDetail() {
                                                 disabled={!file || uploading}
                                                 className={`px-4 py-2 rounded-md flex items-center gap-2 ${!file || uploading
                                                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                    : "bg-blue-600 text-white hover:bg-blue-700"
+                                                    : "bg-gray-700 text-white hover:bg-gray-800"
                                                     }`}
                                             >
                                                 {uploading ? (
@@ -435,7 +394,7 @@ export default function BirthDetail() {
                 <div className="border-t p-4 bg-gray-50 flex justify-end flex-shrink-0">
                     <button
                         onClick={closeModal}
-                        className="px-5 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg transition-colors shadow-md"
+                        className="px-5 py-2 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white rounded-lg transition-colors shadow-md"
                     >
                         Close
                     </button>
@@ -448,7 +407,7 @@ export default function BirthDetail() {
 // Helper component for info items
 function InfoItem({ icon, label, value }) {
     return (
-        <div className="flex items-start space-x-3 py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors">
+        <div className="flex items-start space-x-3 py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
             <div className="mt-0.5 flex-shrink-0">{icon}</div>
             <div className="overflow-hidden">
                 <p className="text-sm text-gray-500">{label}</p>
@@ -467,7 +426,7 @@ function DocumentCard({ title, document, documentType = "unknown" }) {
         <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
             <div className="bg-gray-50 py-3 px-4 border-b">
                 <p className="font-medium text-gray-700 flex items-center gap-2">
-                    <FileText size={16} className={isPDF ? "text-red-500" : "text-blue-500"} />
+                    <FileText size={16} className={isPDF ? "text-gray-600" : "text-gray-600"} />
                     {title}
                 </p>
             </div>
@@ -477,9 +436,9 @@ function DocumentCard({ title, document, documentType = "unknown" }) {
                     {isPDF ? (
                         // PDF document preview
                         <div className="flex flex-col items-center justify-center h-full">
-                            <div className="w-20 h-24 bg-red-50 flex flex-col items-center justify-center mb-2 rounded border border-red-100 shadow-sm">
-                                <div className="text-red-500 font-bold text-lg mb-1">PDF</div>
-                                <FileText size={24} className="text-red-500" />
+                            <div className="w-20 h-24 bg-gray-50 flex flex-col items-center justify-center mb-2 rounded border border-gray-200 shadow-sm">
+                                <div className="text-gray-600 font-bold text-lg mb-1">PDF</div>
+                                <FileText size={24} className="text-gray-600" />
                             </div>
                             <p className="text-sm text-gray-600">PDF Document</p>
                         </div>
@@ -516,8 +475,8 @@ function DocumentCard({ title, document, documentType = "unknown" }) {
                             target="_blank"
                             rel="noopener noreferrer"
                             className={`flex items-center justify-center gap-2 py-2 rounded-md hover:bg-opacity-90 transition-colors text-sm font-medium ${isPDF
-                                ? "bg-red-50 text-red-600 hover:bg-red-100"
-                                : "bg-white text-blue-600 hover:bg-blue-50"
+                                ? "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                                : "bg-white text-gray-700 hover:bg-gray-50"
                                 }`}
                         >
                             <Download size={16} />

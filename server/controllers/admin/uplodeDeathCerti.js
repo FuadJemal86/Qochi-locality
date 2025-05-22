@@ -1,7 +1,7 @@
 const prisma = require('../../prismaClieynt');
 const upload = require('../../upload');
 
-const uploadBirthCertification = [
+const uploadDeathCertification = [
     upload.fields([{ name: "document", maxCount: 1 }]),
     async (req, res) => {
         try {
@@ -46,4 +46,4 @@ const uploadBirthCertification = [
     }
 ];
 
-module.exports = uploadBirthCertification;
+module.exports = uploadDeathCertification;

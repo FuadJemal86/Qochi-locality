@@ -23,6 +23,10 @@ import ParentCerteficate from './components/user/certefiacte/ParentCerteficate';
 import VitalRequest from './components/admin/adminNav/VitalRequest';
 import BirthDetail from './components/admin/adminNav/BirthDetail';
 import Documents from './components/user/userNav/Documents';
+import MarriageDetail from './components/admin/adminNav/MarriageDetail';
+import DeathDetail from './components/admin/adminNav/DeathDetail';
+import DivorceDetail from './components/admin/adminNav/DivorceDetail';
+import NewMember from './components/admin/adminNav/NewMember';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -44,6 +48,10 @@ function App() {
           <Route path='vital-event' element={<VitalRequest />} />
           {/* certificate detail info */}
           <Route path='birth-detail/:id' element={<BirthDetail />} />
+          <Route path='marriage-detail/:id' element={<MarriageDetail />} />
+          <Route path='death-detail/:id' element={<DeathDetail />} />
+          <Route path='divorce-detail/:id' element={<DivorceDetail />} />
+          <Route path='new-member' element={<NewMember />} />
         </Route>
 
         {/* family header Dashboard */}

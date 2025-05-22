@@ -5,24 +5,32 @@ const uploadIdDocument = [
     upload.fields([{ name: "document", maxCount: 1 }]),
     async (req, res) => {
         try {
-            const { headId } = req.body;
+            const { id } = req.body;
 
-            if (!headId) {
-                return res.status(400).json({ status: false, message: "headId ID is required" });
+            if (!id) {
+                return res.status(400).json({ status: false, message: "Member ID is required" });
             }
 
             if (!req.files || !req.files.document || req.files.document.length === 0) {
                 return res.status(400).json({ status: false, message: "No document uploaded" });
             }
 
+            const member = await prisma.member.findFirst({
+                where: { id: parseInt(id) },
+                select: { headId: true }
+            });
+
+            if (!member || !member.headId) {
+                return res.status(404).json({ status: false, message: "Member or associated family head not found" });
+            }
+
             const documentFile = req.files.document[0];
             const documentPath = documentFile.filename;
 
-
-
             await prisma.certiAndId.create({
                 data: {
-                    familyHeadId: parseInt(headId),
+                    familyHeadId: member.headId,
+                    memberId: parseInt(id),
                     document: documentPath
                 }
             });

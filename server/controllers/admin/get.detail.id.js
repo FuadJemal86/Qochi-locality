@@ -5,7 +5,7 @@ const getDetailIdInfo = async (req, res) => {
     const { id } = req.params
     try {
         const getDetailId = await prisma.iDRequest.findFirst({
-            where: { familyHeadId: Number(id) },
+            where: { memberId: Number(id) },
             include: {
                 familyHead: {
                     select: {

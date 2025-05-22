@@ -236,7 +236,7 @@ function DeathApproval() {
                                             <td className="py-4 px-4 whitespace-nowrap">
                                                 <div className="flex space-x-2">
                                                     <Link
-                                                        to={`/admin-dashboard/get-detail-death-certificate/${certificate.id}`}
+                                                        to={`/admin-dashboard/death-detail/${certificate.memberId}`}
                                                         className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
                                                         title="View Details"
                                                     >

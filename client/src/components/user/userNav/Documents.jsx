@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Download, Eye, Trash2, RefreshCcw } from 'lucide-react';
+import { FileText, Download, Eye, Trash2, RefreshCcw, User } from 'lucide-react';
 import api from '../../../../api';
 
 function Documents() {
@@ -148,16 +148,24 @@ function Documents() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {documents.map((doc) => (
           <div key={doc.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-            <div className="p-4 bg-gray-50 border-b flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                {getFileIcon(doc.document)}
-                <span className="font-medium text-gray-700 truncate max-w-[150px]">
-                  Document #{doc.id}
+            <div className="p-4 bg-gray-50 border-b">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-2">
+                  {getFileIcon(doc.document)}
+                  <span className="font-medium text-gray-700 truncate max-w-32">
+                    Document #{doc.id}
+                  </span>
+                </div>
+                <span className="text-xs bg-blue-100 text-blue-800 py-1 px-2 rounded-full">
+                  Family ID: {doc.familyHeadId}
                 </span>
               </div>
-              <span className="text-xs bg-blue-100 text-blue-800 py-1 px-2 rounded-full">
-                Family ID: {doc.familyHeadId}
-              </span>
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <User size={14} />
+                <span className="truncate">{doc.member?.fullName || 'Unknown Member'}</span>
+                <span className="text-gray-400">•</span>
+                <span>Member ID: {doc.memberId}</span>
+              </div>
             </div>
 
             {/* Document preview area */}
@@ -228,6 +236,14 @@ function Documents() {
                   <span className="font-medium text-gray-700">{doc.familyHeadId}</span>
                 </div>
                 <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Member ID:</span>
+                  <span className="font-medium text-gray-700">{doc.memberId}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Member Name:</span>
+                  <span className="font-medium text-gray-700 truncate">{doc.member?.fullName || 'Unknown'}</span>
+                </div>
+                <div className="flex justify-between text-sm">
                   <span className="text-gray-500">File Type:</span>
                   <span className="font-medium text-gray-700 uppercase">{getFileExtension(doc.document)}</span>
                 </div>
@@ -240,9 +256,14 @@ function Documents() {
       {/* Document Preview Modal */}
       {previewOpen && selectedDocument && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden animate-fade-in">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden animate-fade-in">
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4 flex justify-between items-center">
-              <h3 className="text-white font-medium">Document Preview</h3>
+              <div>
+                <h3 className="text-white font-medium">Document Preview</h3>
+                <p className="text-blue-100 text-sm">
+                  {selectedDocument.member?.fullName || 'Unknown Member'} • Member ID: {selectedDocument.memberId}
+                </p>
+              </div>
               <button
                 onClick={closePreview}
                 className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1"
@@ -273,7 +294,7 @@ function Documents() {
 
               <div className="mt-6 bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-medium text-gray-700 mb-2">Document Information</h4>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div>
                     <p className="text-sm text-gray-500">Document ID</p>
                     <p className="font-medium">{selectedDocument.id}</p>
@@ -281,6 +302,14 @@ function Documents() {
                   <div>
                     <p className="text-sm text-gray-500">Family Head ID</p>
                     <p className="font-medium">{selectedDocument.familyHeadId}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Member ID</p>
+                    <p className="font-medium">{selectedDocument.memberId}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Member Name</p>
+                    <p className="font-medium">{selectedDocument.member?.fullName || 'Unknown Member'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">File Name</p>

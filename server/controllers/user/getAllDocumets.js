@@ -13,7 +13,14 @@ const getAllDocuments = async (req, res) => {
         headId = decoded.id;
 
         const getAllDocuments = await prisma.certiAndId.findMany({
-            where: { familyHeadId: Number(headId) }
+            where: { familyHeadId: Number(headId) },
+            include: {
+                member: {
+                    select: {
+                        fullName: true
+                    }
+                }
+            }
         })
 
         if (!getAllDocuments) {

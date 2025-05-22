@@ -1,7 +1,7 @@
 const prisma = require('../../prismaClieynt');
 const upload = require('../../upload');
 
-const uploadBirthCertification = [
+const uploadDivorceCertification = [
     upload.fields([{ name: "document", maxCount: 1 }]),
     async (req, res) => {
         try {
@@ -37,7 +37,7 @@ const uploadBirthCertification = [
                 }
             });
 
-            return res.status(200).json({ status: true, message: "Birth certificate uploaded successfully" });
+            return res.status(200).json({ status: true, message: "Divorce certificate uploaded successfully" });
 
         } catch (error) {
             console.error("Upload error:", error);
@@ -46,4 +46,4 @@ const uploadBirthCertification = [
     }
 ];
 
-module.exports = uploadBirthCertification;
+module.exports = uploadDivorceCertification;

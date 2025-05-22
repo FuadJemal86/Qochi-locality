@@ -6,7 +6,7 @@ import { saveAs } from 'file-saver';
 import api from '../../../../api';
 import toast, { Toaster } from 'react-hot-toast';
 
-function IdRequestT() {
+function NewMember() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [detailMemberData, setDetailMemberData] = useState({});
     const [selectedFamilyId, setSelectedFamilyId] = useState(null);
@@ -25,7 +25,6 @@ function IdRequestT() {
             APPROVED: "bg-green-100 text-green-800",
             PENDING: "bg-yellow-100 text-yellow-800",
             REJECTED: "bg-red-100 text-red-800",
-            EXPIRED: "bg-red-100 text-red-800"
         };
 
         return statusColors[status] || "bg-gray-100 text-gray-800";
@@ -64,8 +63,6 @@ function IdRequestT() {
         }
     };
 
-
-
     const handleEdit = (id) => {
         // Handle edit logic here
         console.log(`Edit family with ID: ${id}`);
@@ -93,9 +90,9 @@ function IdRequestT() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const result = await api.get('/admin/get-id-request');
+            const result = await api.get('/admin/get-members');
             if (result.data.status) {
-                setFamilyHeadsData(result.data.getIdRequest);
+                setFamilyHeadsData(result.data.familyMembers);
             } else {
                 console.log(result.data.message);
             }
@@ -105,8 +102,6 @@ function IdRequestT() {
             setIsLoading(false);
         }
     };
-
-
 
     // print the customer table
     const handlePrint = () => {
@@ -149,7 +144,7 @@ function IdRequestT() {
 
     const handleApproval = async (value, id) => {
         try {
-            const result = await api.put(`/admin/id-approval/${id}`, {
+            const result = await api.put(`/admin/member-approval/${id}`, {
                 ...statusState,
                 status: value
             });
@@ -188,7 +183,7 @@ function IdRequestT() {
                     </button>
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">Id Request</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">Family Members</h1>
 
                     <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
                         <div className="relative flex-grow">
@@ -212,109 +207,112 @@ function IdRequestT() {
                                 <tr>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Head Name</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Occupation</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Header Name</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birth Date</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relation</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan="9" className="py-8 text-center text-gray-500">
+                                        <td colSpan="8" className="py-8 text-center text-gray-500">
                                             <div className="flex justify-center items-center">
                                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                                                 <span className="ml-3">Loading data...</span>
                                             </div>
                                         </td>
                                     </tr>
-                                ) : familyHeadsData.length > 0 ? (
-                                    familyHeadsData.map((request) => (
-                                        <tr key={request.id} className="hover:bg-gray-50 transition-colors duration-150">
-                                            {/* ID */}
-                                            <td className="py-4 px-4 whitespace-nowrap">{request.id}</td>
+                                ) : currentItems.length > 0 ? (
+                                    currentItems.map((family) =>
+                                        family.members.map((member) => (
+                                            <tr key={`${family.id}-${member.id}`} className="hover:bg-gray-50 transition-colors duration-150">
+                                                {/* Family ID */}
+                                                <td className="py-4 px-4 whitespace-nowrap">{family.id}</td>
 
-                                            {/* Full Name */}
-                                            <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{request.fullName || "No Name"}</td>
+                                                {/* Family Head Name */}
+                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.fullName || "No Family Name"}</td>
 
-                                            {/* Head Name */}
-                                            <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{request.familyHead?.fullName || "No Head Name"}</td>
+                                                {/* Member Name */}
+                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{family.fullName || "No Member Name"}</td>
 
-                                            {/* Occupation */}
-                                            <td className="py-4 px-4 whitespace-nowrap text-gray-700">{request.occupation || "No Occupation"}</td>
+                                                {/* Member Birth Date */}
+                                                <td className="p-3 text-sm text-gray-500">
+                                                    {member.birthDate
+                                                        ? new Date(member.birthDate).toLocaleDateString("en-GB", {
+                                                            day: "numeric",
+                                                            month: "long",
+                                                            year: "numeric",
+                                                        }).replace(/ /g, ".")
+                                                        : "No Birth Date"}
+                                                </td>
 
-                                            {/* Phone Number */}
-                                            <td className="py-4 px-4 whitespace-nowrap text-gray-700">{request.phoneNumber || "No Phone Number"}</td>
+                                                {/* Relationship */}
+                                                <td className="py-4 px-4 whitespace-nowrap text-gray-700">{member.relationship || "No Relationship"}</td>
 
-                                            {/* Type */}
-                                            <td className="py-4 px-4 whitespace-nowrap text-gray-700">{request.type || "No Type"}</td>
+                                                {/* Member Created At */}
+                                                <td className="p-3 text-sm text-gray-500">
+                                                    {member.createdAt
+                                                        ? new Date(member.createdAt).toLocaleDateString("en-GB", {
+                                                            day: "numeric",
+                                                            month: "long",
+                                                            year: "numeric",
+                                                        }).replace(/ /g, ".")
+                                                        : "No Created Date"}
+                                                </td>
 
-                                            {/* status */}
-                                            <td>
-                                                <select
-                                                    value={request.status || "PENDING"}
-                                                    onChange={e => handleApproval(e.target.value, request.id)}
-                                                    className={`px-2 py-1 rounded-full text-xs font-medium outline-none ${getStatusBadgeColor(request.status)}`}
-                                                >
-                                                    <option value="PENDING">PENDING</option>
-                                                    <option value="APPROVED">APPROVED</option>
-                                                    <option value="REJECTED">REJECTED</option>
-                                                    <option value="EXPIRED">EXPIRED</option>
-                                                </select>
-                                            </td>
-
-                                            {/* Created At */}
-                                            <td className="p-3 text-sm text-gray-500">
-                                                {request.createdAt
-                                                    ? new Date(request.createdAt).toLocaleDateString("en-GB", {
-                                                        day: "numeric",
-                                                        month: "long",
-                                                        year: "numeric",
-                                                    }).replace(/ /g, ".")
-                                                    : "No Created Date"}
-                                            </td>
-
-                                            {/* Actions */}
-                                            <td className="py-4 px-4 whitespace-nowrap">
-                                                <div className="flex space-x-2">
-                                                    <Link
-                                                        to={`/admin-dashboard/get-detail-id/${request.memberId}`}
-                                                        className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
-                                                        title="View Details"
+                                                {/* Approval Status */}
+                                                <td>
+                                                    <select
+                                                        value={member.isApproved || "PENDING"}
+                                                        onChange={e => handleApproval(e.target.value, member.id)}
+                                                        className={`px-2 py-1 rounded-full text-xs font-medium outline-none ${getStatusBadgeColor(member.isApproved)}`}
                                                     >
-                                                        <Info size={18} />
-                                                    </Link>
-                                                    <button
-                                                        onClick={() => handleEdit(request.id)}
-                                                        className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
-                                                        title="Edit"
-                                                    >
-                                                        <Edit size={18} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(request.id)}
-                                                        className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
-                                                        title="Delete"
-                                                    >
-                                                        <Trash size={18} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
+                                                        <option value="PENDING">PENDING</option>
+                                                        <option value="APPROVED">APPROVED</option>
+                                                        <option value="REJECTED">REJECTED</option>
+                                                    </select>
+                                                </td>
+
+                                                {/* Action Buttons */}
+                                                <td className="py-4 px-4 whitespace-nowrap">
+                                                    <div className="flex space-x-2">
+                                                        <Link to={`/admin-dashboard/get-detail-member/${member.id}`}
+                                                            className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
+                                                            title="View Details"
+                                                        >
+                                                            <Info size={18} />
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => handleEdit(member.id)}
+                                                            className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
+                                                            title="Edit"
+                                                        >
+                                                            <Edit size={18} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(member.id)}
+                                                            className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
+                                                            title="Delete"
+                                                        >
+                                                            <Trash size={18} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )
                                 ) : (
                                     <tr>
-                                        <td colSpan="9" className="py-8 text-center text-gray-500">
-                                            No data available.
+                                        <td colSpan="8" className="py-8 text-center text-gray-500">
+                                            {familyHeadsData.length === 0 ? "No data available." : "No families found matching your search."}
                                         </td>
                                     </tr>
                                 )}
                             </tbody>
                         </table>
-
                     </div>
                 </div>
 
@@ -347,4 +345,4 @@ function IdRequestT() {
     );
 }
 
-export default IdRequestT;
+export default NewMember;

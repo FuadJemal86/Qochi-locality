@@ -1,21 +1,20 @@
 const prisma = require('../../prismaClieynt');
 const upload = require('../../upload');
 
-const uploadBirthCertification = [
+const uploadMarriageCertification = [
     upload.fields([{ name: "document", maxCount: 1 }]),
     async (req, res) => {
         try {
-            const { id } = req.body; // memberId
+            const { id } = req.body;
 
             if (!id) {
-                return res.status(400).json({ status: false, message: "Member ID is required" });
+                return res.status(400).json({ status: false, message: "member ID is required" });
             }
 
             if (!req.files || !req.files.document || req.files.document.length === 0) {
                 return res.status(400).json({ status: false, message: "No document uploaded" });
             }
 
-            // Look up the familyHeadId using the member's id
             const member = await prisma.member.findUnique({
                 where: { id: parseInt(id) },
                 select: { headId: true }
@@ -28,16 +27,15 @@ const uploadBirthCertification = [
             const documentFile = req.files.document[0];
             const documentPath = documentFile.filename;
 
-            // Store document with familyHeadId and optionally memberId
             await prisma.certiAndId.create({
                 data: {
-                    familyHeadId: member.headId,
                     memberId: parseInt(id),
+                    familyHeadId: member.headId,
                     document: documentPath
                 }
             });
 
-            return res.status(200).json({ status: true, message: "Birth certificate uploaded successfully" });
+            return res.status(200).json({ status: true, message: "Document uploaded successfully" });
 
         } catch (error) {
             console.error("Upload error:", error);
@@ -46,4 +44,4 @@ const uploadBirthCertification = [
     }
 ];
 
-module.exports = uploadBirthCertification;
+module.exports = uploadMarriageCertification;

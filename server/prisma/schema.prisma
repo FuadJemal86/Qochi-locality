@@ -91,6 +91,7 @@ model Member {
   marriageCertificates MarriageCertificate[] @relation("MemberMarriageCertificate")
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
+  certiAndIds          certiAndId[]          @relation("MemberVitalCertificate")
 }
 
 model IDRequest {
@@ -239,6 +240,8 @@ model certiAndId {
   familyHeadId Int
   document     String?
   familyHead   FamilyHead @relation(fields: [familyHeadId], references: [id])
+  memberId     Int?
+  member       Member?    @relation("MemberVitalCertificate", fields: [memberId], references: [id])
 }
 
 enum MemberType {
