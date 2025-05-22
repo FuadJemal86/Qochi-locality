@@ -207,7 +207,7 @@ export default function AdminNav() {
                                             />
                                         </Link>
 
-                                        <Link to={'/admin-dashboard/new-members'}>
+                                        <Link to={'/admin-dashboard/new-member'}>
                                             <SubMenuItem
                                                 icon={<UserPlus className="h-4 w-4" />}
                                                 label="New Members"
@@ -220,7 +220,7 @@ export default function AdminNav() {
                                             />
                                         </Link>
 
-                                        <Link to={'/admin-dashboard/removed-members'}>
+                                        <Link to={'/admin-dashboard/remove-member'}>
                                             <SubMenuItem
                                                 icon={<UserX className="h-4 w-4" />}
                                                 label="Removed Members"

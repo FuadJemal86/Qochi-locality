@@ -27,6 +27,9 @@ const { getDeathDetail } = require('../controllers/admin/deathDetail')
 const uploadDeathCertification = require('../controllers/admin/uplodeDeathCerti')
 const uploadDivorceCertification = require('../controllers/admin/uplodeDivorceCeri')
 const { getDivorceDetail } = require('../controllers/admin/divorceDetail')
+const { geNewtMembers } = require('../controllers/admin/getNewMember')
+const { getRemoveMembers } = require('../controllers/admin/getRemoveMember')
+const { getRejectMembers } = require('../controllers/admin/getRejectMember')
 
 const router = express.Router()
 
@@ -51,6 +54,9 @@ router.get('/get-birth-certificate', getBirthCertificate)
 router.get('/get-marriage-certificate', getMarriageCertification)
 router.get('/get-death-certificate', getDeathCertificate)
 router.get('/get-divorce-certificate', getDivorceCertificate)
+router.get('/get-new-member', geNewtMembers)
+router.get('/get-removed-member', getRemoveMembers)
+router.get('/get-reject-member', getRejectMembers)
 
 // certificate detail info
 router.get('/get-birth-detail/:id', getBirthDetail)

@@ -296,4 +296,5 @@ enum WhoMember {
   Header
   Wife
   Child
+  Other
 }

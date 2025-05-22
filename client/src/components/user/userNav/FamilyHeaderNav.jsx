@@ -24,7 +24,8 @@ import {
     IdCard,
     VideotapeIcon,
     File,
-    Folder
+    Folder,
+    UserMinus
 } from 'lucide-react';
 
 export default function FamilyHeaderNav() {
@@ -33,6 +34,29 @@ export default function FamilyHeaderNav() {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [activeItem, setActiveItem] = useState('dashboard');
     const [isMobile, setIsMobile] = useState(false);
+    const location = useLocation();
+
+    // Update active item based on current route
+    useEffect(() => {
+        const path = location.pathname;
+        if (path.includes('family-members')) {
+            setActiveItem('family-members');
+        } else if (path.includes('removed-family-member')) {
+            setActiveItem('removed-members');
+            setActiveDropdown('users');
+        } else if (path.includes('rejected-members')) {
+            setActiveItem('rejected-members');
+            setActiveDropdown('users');
+        } else if (path.includes('id')) {
+            setActiveItem('id-request');
+        } else if (path.includes('vital-event')) {
+            setActiveItem('vital-event');
+        } else if (path.includes('all-document')) {
+            setActiveItem('documents');
+        } else {
+            setActiveItem('dashboard');
+        }
+    }, [location.pathname]);
 
     // Check for mobile screen size
     useEffect(() => {
@@ -73,47 +97,65 @@ export default function FamilyHeaderNav() {
         }
     };
 
-
     // Navigation item component with improved focus effects
-    const NavItem = ({ icon, label, id, hasDropdown = false, onClick, isActive }) => {
+    const NavItem = ({ icon, label, id, hasDropdown = false, onClick, isActive, children }) => {
         return (
-            <button
-                onClick={onClick}
-                className={`flex items-center justify-between w-full px-4 py-3 rounded-md transition-all duration-200 ${isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-800'
-                    }`}
-            >
-                <div className="flex items-center">
-                    {icon}
-                    {(!collapsed || isMobile) && <span className={`ml-3 font-medium ${isActive ? 'text-white' : 'group-hover:text-white'}`}>{label}</span>}
-                </div>
-                {(!collapsed || isMobile) && hasDropdown && (
-                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isActive ? 'transform rotate-180' : ''}`} />
-                )}
-            </button>
+            <div>
+                <button
+                    onClick={onClick}
+                    className={`flex items-center justify-between w-full px-4 py-3 rounded-md transition-all duration-200 ${isActive
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-300 hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-800'
+                        }`}
+                >
+                    <div className="flex items-center">
+                        {icon}
+                        {(!collapsed || isMobile) && <span className={`ml-3 font-medium ${isActive ? 'text-white' : 'group-hover:text-white'}`}>{label}</span>}
+                    </div>
+                    {(!collapsed || isMobile) && hasDropdown && (
+                        <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${activeDropdown === id ? 'transform rotate-180' : ''}`} />
+                    )}
+                </button>
+                {children}
+            </div>
         );
     };
 
     // Dropdown item component
-    const DropdownItem = ({ icon, label, id, onClick }) => {
+    const DropdownItem = ({ icon, label, id, to, isActive }) => {
         return (
-            <a
-                href="#"
-                onClick={(e) => {
-                    e.preventDefault();
-                    setActiveItem(id);
-                    if (onClick) onClick();
-                }}
-                className={`flex items-center px-4 py-2 text-sm rounded-md transition-all duration-200 ${activeItem === id
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-700'
-                    }`}
-            >
-                {icon}
-                <span className="ml-3">{label}</span>
-            </a>
+            <li>
+                <Link
+                    to={to}
+                    className={`flex items-center px-4 py-2 text-sm rounded-md transition-all duration-200 ${isActive
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-700'
+                        }`}
+                    onClick={() => {
+                        setActiveItem(id);
+                        if (isMobile) setSidebarOpen(false);
+                    }}
+                >
+                    {icon}
+                    <span className="ml-3">{label}</span>
+                </Link>
+            </li>
         );
+    };
+
+    // Get display name for header
+    const getDisplayName = (itemId) => {
+        const displayNames = {
+            'dashboard': 'Dashboard',
+            'family-members': 'Family Members',
+            'removed-members': 'Removed Members',
+            'rejected-members': 'Rejected Members',
+            'id-request': 'ID Request',
+            'vital-event': 'Vital Event',
+            'documents': 'Documents',
+            'setting': 'Settings'
+        };
+        return displayNames[itemId] || itemId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     };
 
     return (
@@ -154,130 +196,129 @@ export default function FamilyHeaderNav() {
                     <ul className="space-y-2 px-2">
                         {/* Dashboard */}
                         <li>
-                            <NavItem
-                                icon={<Home className="h-5 w-5" />}
-                                label="Dashboard"
-                                id="dashboard"
-                                isActive={activeItem === 'dashboard'}
-                                onClick={() => {
-                                    setActiveItem('dashboard');
-                                    if (isMobile) setSidebarOpen(false);
-                                }}
-                            />
-                        </li>
-
-                        <li>
-                            <Link to={'/family-head-dashboard/family-members'}>
+                            <Link to="/family-head-dashboard">
                                 <NavItem
                                     icon={<Home className="h-5 w-5" />}
-                                    label="Family Members"
-                                    id="family-Members"
-                                    isActive={activeItem === 'family-Members'}
+                                    label="Dashboard"
+                                    id="dashboard"
+                                    isActive={activeItem === 'dashboard'}
                                     onClick={() => {
-                                        setActiveItem('family-Members');
+                                        setActiveItem('dashboard');
                                         if (isMobile) setSidebarOpen(false);
                                     }}
-                                /></Link>
+                                />
+                            </Link>
                         </li>
 
-                        {/* Users Section */}
+                        {/* Family Members */}
+                        <li>
+                            <Link to="/family-head-dashboard/family-members">
+                                <NavItem
+                                    icon={<Users className="h-5 w-5" />}
+                                    label="Family Members"
+                                    id="family-members"
+                                    isActive={activeItem === 'family-members'}
+                                    onClick={() => {
+                                        setActiveItem('family-members');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                />
+                            </Link>
+                        </li>
+
+                        {/* Members Section with Dropdown */}
                         <li>
                             <NavItem
-                                icon={<Users className="h-5 w-5" />}
-                                label="Members"
-                                id="members"
+                                icon={<UserCheck className="h-5 w-5" />}
+                                label="Member Status"
+                                id="users"
                                 hasDropdown={true}
                                 isActive={activeDropdown === 'users'}
                                 onClick={() => toggleDropdown('users')}
-                            />
-
-                            {sidebarOpen && activeDropdown === 'users' && (
-                                <ul className="mt-2 pl-6 space-y-2">
-                                    <li>
+                            >
+                                {sidebarOpen && activeDropdown === 'users' && (
+                                    <ul className="mt-2 pl-6 space-y-2">
                                         <DropdownItem
                                             icon={<UserX className="h-4 w-4" />}
                                             label="Removed Members"
                                             id="removed-members"
-                                            onClick={() => {
-                                                if (isMobile) setSidebarOpen(false);
-                                            }}
+                                            to="/family-head-dashboard/removed-family-member"
+                                            isActive={activeItem === 'removed-members'}
                                         />
-                                    </li>
-                                </ul>
-                            )}
+                                        <DropdownItem
+                                            icon={<UserMinus className="h-4 w-4" />}
+                                            label="Rejected Members"
+                                            id="rejected-members"
+                                            to="/family-head-dashboard/rejected-memebrs"
+                                            isActive={activeItem === 'rejected-members'}
+                                        />
+                                    </ul>
+                                )}
+                            </NavItem>
                         </li>
 
+                        {/* ID Request */}
                         <li>
-                            <Link to={'/family-head-dashboard/rejected-memebrs'}>
-                                <NavItem
-                                    icon={<UserX className="h-5 w-5" />}
-                                    label="Rejected Members"
-                                    id="rejected-members"
-                                    isActive={activeItem === 'rejected-members'}
-                                    onClick={() => {
-                                        setActiveItem('rejected-members');
-                                        if (isMobile) setSidebarOpen(false);
-                                    }}
-                                />
-                            </Link>
-                        </li>
-
-                        <li>
-                            <Link to={'/family-head-dashboard/id'}>
+                            <Link to="/family-head-dashboard/id">
                                 <NavItem
                                     icon={<IdCard className="h-5 w-5" />}
-                                    label="Id Request"
-                                    id="Id Request"
-                                    isActive={activeItem === 'id request'}
+                                    label="ID Request"
+                                    id="id-request"
+                                    isActive={activeItem === 'id-request'}
                                     onClick={() => {
-                                        setActiveItem('id request');
+                                        setActiveItem('id-request');
                                         if (isMobile) setSidebarOpen(false);
                                     }}
                                 />
                             </Link>
                         </li>
 
+                        {/* Vital Event */}
                         <li>
-                            <Link to={'/family-head-dashboard/vital-event'}>
+                            <Link to="/family-head-dashboard/vital-event">
                                 <NavItem
                                     icon={<VideotapeIcon className="h-5 w-5" />}
                                     label="Vital Event"
-                                    id="Vital Event"
-                                    isActive={activeItem === 'Vital Event'}
+                                    id="vital-event"
+                                    isActive={activeItem === 'vital-event'}
                                     onClick={() => {
-                                        setActiveItem('Vital Event');
+                                        setActiveItem('vital-event');
                                         if (isMobile) setSidebarOpen(false);
                                     }}
                                 />
                             </Link>
                         </li>
 
+                        {/* Documents */}
                         <li>
-                            <Link to={'/family-head-dashboard/all-document'}>
+                            <Link to="/family-head-dashboard/all-document">
                                 <NavItem
                                     icon={<Folder className="h-5 w-5" />}
                                     label="Documents"
-                                    id="Documents"
-                                    isActive={activeItem === 'Documents'}
+                                    id="documents"
+                                    isActive={activeItem === 'documents'}
                                     onClick={() => {
-                                        setActiveItem('Documents');
+                                        setActiveItem('documents');
                                         if (isMobile) setSidebarOpen(false);
                                     }}
                                 />
                             </Link>
                         </li>
 
+                        {/* Settings */}
                         <li>
-                            <NavItem
-                                icon={<Settings className="h-5 w-5" />}
-                                label="Setting"
-                                id="Setting"
-                                isActive={activeItem === 'Setting'}
-                                onClick={() => {
-                                    setActiveItem('Setting');
-                                    if (isMobile) setSidebarOpen(false);
-                                }}
-                            />
+                            <Link to="/header-setting">
+                                <NavItem
+                                    icon={<Settings className="h-5 w-5" />}
+                                    label="Settings"
+                                    id="setting"
+                                    isActive={activeItem === 'setting'}
+                                    onClick={() => {
+                                        setActiveItem('setting');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                />
+                            </Link>
                         </li>
                     </ul>
                 </div>
@@ -298,7 +339,7 @@ export default function FamilyHeaderNav() {
                                 </button>
                             )}
                             <h1 className="text-lg font-medium text-gray-800 ml-2">
-                                {activeItem.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                {getDisplayName(activeItem)}
                             </h1>
                         </div>
 
@@ -313,9 +354,9 @@ export default function FamilyHeaderNav() {
                                 <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 relative">
                                     <CircleUser className="h-6 w-6" />
                                 </button>
-                                <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 relative">
+                                <Link to={'/header-setting'} className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 relative">
                                     <Settings className="h-6 w-6" />
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </div>

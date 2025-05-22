@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Edit, Trash, Info, UserPlus, X, Search, ChevronLeft, ChevronRight, Printer, FileSpreadsheet } from 'lucide-react';
+import { Edit, Trash, Info, UserPlus, X, Search, ChevronLeft, ChevronRight, Printer, FileSpreadsheet, RotateCcw } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../../../../api';
 import toast, { Toaster } from 'react-hot-toast';
 
-function NewMember() {
+function RejectedMember() {
     const [searchTerm, setSearchTerm] = useState('');
-    const [familyNewMembersData, setFamilyNewMembersData] = useState([]);
+    const [familyRejectedMembersData, setFamilyRejectedMembersData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [statusState, setStatusState] = useState({
         status: ''
@@ -26,12 +26,28 @@ function NewMember() {
         return statusColors[status] || "bg-gray-100 text-gray-800";
     };
 
+    const getMemberStatusColor = (status) => {
+        const statusColors = {
+            ACTIVE: "bg-green-100 text-green-800",
+            DECEASED: "bg-red-100 text-red-800",
+            INACTIVE: "bg-gray-100 text-gray-800",
+        };
+        return statusColors[status] || "bg-gray-100 text-gray-800";
+    };
+
+    const getRemovalStatusColor = (isRemoved) => {
+        return isRemoved
+            ? "bg-red-100 text-red-800"
+            : "bg-green-100 text-green-800";
+    };
+
     // Filter data based on search term
-    const filteredData = familyNewMembersData.filter(member =>
+    const filteredData = familyRejectedMembersData.filter(member =>
         member.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         member.relationship?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         member.occupation?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        member.education?.toLowerCase().includes(searchTerm.toLowerCase())
+        member.education?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.whoMember?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     // Pagination logic
@@ -48,6 +64,21 @@ function NewMember() {
     const handleDelete = (id) => {
         // Handle delete logic here
         console.log(`Delete member with ID: ${id}`);
+    };
+
+    const handleRestore = async (id) => {
+        try {
+            const result = await api.put(`/admin/restore-member/${id}`);
+            if (result.data.status) {
+                toast.success("Member restored successfully");
+                fetchData();
+            } else {
+                toast.error(result.data.message || "Failed to restore member");
+            }
+        } catch (err) {
+            console.error('Error restoring member:', err);
+            toast.error("An error occurred while restoring member");
+        }
     };
 
     const formatDate = (dateString) => {
@@ -67,15 +98,16 @@ function NewMember() {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const result = await api.get('/admin/get-new-member');
+            const result = await api.get('/admin/get-reject-member');
             if (result.data.status) {
-                setFamilyNewMembersData(result.data.familyNewMembers);
+                // Updated to match the actual JSON structure
+                setFamilyRejectedMembersData(result.data.familyRejectMembers || []);
             } else {
                 console.log(result.data.message);
                 toast.error(result.data.message || "Failed to fetch data");
             }
         } catch (err) {
-            console.error('Error fetching new members:', err);
+            console.error('Error fetching rejected members:', err);
             toast.error("Error fetching data");
         } finally {
             setIsLoading(false);
@@ -84,12 +116,12 @@ function NewMember() {
 
     // print the customer table
     const handlePrint = () => {
-        const printContent = document.getElementById("new-members-table");
+        const printContent = document.getElementById("rejected-members-table");
         const WindowPrt = window.open('', '', 'width=900,height=650');
         WindowPrt.document.write(`
                 <html>
                     <head>
-                        <title>New Family Members</title>
+                        <title>Rejected Family Members</title>
                         <style>
                             body { font-family: Arial; padding: 20px; }
                             table { width: 100%; border-collapse: collapse; }
@@ -108,26 +140,33 @@ function NewMember() {
 
     //  export Excel file
     const exportToExcel = () => {
-        const exportData = familyNewMembersData.map(member => ({
+        const exportData = familyRejectedMembersData.map(member => ({
             ID: member.id,
             'Full Name': member.fullName,
             'Birth Date': formatDate(member.birthDate),
+            Type: member.type,
             Relationship: member.relationship,
             Education: member.education,
             Occupation: member.occupation,
+            Status: member.status,
             'Member Type': member.memberType,
             'Who Member': member.whoMember,
-            Status: member.isApproved,
-            'Created At': formatDate(member.createdAt)
+            'Is Removed': member.isRemoved ? 'Yes' : 'No',
+            'Approval Status': member.isApproved,
+            'Is Restored': member.idRestored ? 'Yes' : 'No',
+            'Restoration Date': formatDate(member.restorationDate),
+            'Head ID': member.headId,
+            'Created At': formatDate(member.createdAt),
+            'Updated At': formatDate(member.updatedAt)
         }));
 
         const ws = XLSX.utils.json_to_sheet(exportData);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "New Members");
+        XLSX.utils.book_append_sheet(wb, ws, "Rejected Members");
 
         const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
         const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(data, "New_Members.xlsx");
+        saveAs(data, "Rejected_Members.xlsx");
     };
 
     const handleApproval = async (value, id) => {
@@ -169,13 +208,13 @@ function NewMember() {
                     </button>
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">New Family Members</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">Rejected Family Members</h1>
 
                     <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
                         <div className="relative flex-grow">
                             <input
                                 type="text"
-                                placeholder="Search members..."
+                                placeholder="Search rejected members..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -186,7 +225,7 @@ function NewMember() {
                 </div>
 
                 {/* Main table */}
-                <div className="border border-gray-200 rounded-lg shadow-sm overflow-hidden" id='new-members-table'>
+                <div className="border border-gray-200 rounded-lg shadow-sm overflow-hidden" id='rejected-members-table'>
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
@@ -194,19 +233,20 @@ function NewMember() {
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Birth Date</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relationship</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Education</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Occupation</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member Type</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Who Member</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approval Status</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Restored</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan="10" className="py-8 text-center text-gray-500">
+                                        <td colSpan="12" className="py-8 text-center text-gray-500">
                                             <div className="flex justify-center items-center">
                                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                                                 <span className="ml-3">Loading data...</span>
@@ -231,6 +271,13 @@ function NewMember() {
                                                 {formatDate(member.birthDate)}
                                             </td>
 
+                                            {/* Type */}
+                                            <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-700">
+                                                <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">
+                                                    {member.type || "No Type"}
+                                                </span>
+                                            </td>
+
                                             {/* Relationship */}
                                             <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-700">
                                                 {member.relationship || "No Relationship"}
@@ -246,63 +293,39 @@ function NewMember() {
                                                 {member.occupation || "No Occupation"}
                                             </td>
 
-                                            {/* Member Type */}
-                                            <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-700">
-                                                <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                                                    {member.memberType || "No Type"}
+                                            {/* Status */}
+                                            <td className="py-4 px-4 whitespace-nowrap">
+                                                <span className={`px-2 py-1 text-xs rounded-full font-medium ${getMemberStatusColor(member.status)}`}>
+                                                    {member.status || "Unknown"}
                                                 </span>
                                             </td>
 
-                                            {/* Created At */}
-                                            <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-500">
-                                                {formatDate(member.createdAt)}
+                                            {/* Who Member */}
+                                            <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-700">
+                                                <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                                    {member.whoMember || "No Info"}
+                                                </span>
                                             </td>
 
                                             {/* Approval Status */}
                                             <td className="py-4 px-4 whitespace-nowrap">
-                                                <select
-                                                    value={member.isApproved || "PENDING"}
-                                                    onChange={e => handleApproval(e.target.value, member.id)}
-                                                    className={`px-2 py-1 rounded-full text-xs font-medium outline-none border-0 ${getStatusBadgeColor(member.isApproved)}`}
-                                                >
-                                                    <option value="PENDING">PENDING</option>
-                                                    <option value="APPROVED">APPROVED</option>
-                                                    <option value="REJECTED">REJECTED</option>
-                                                </select>
+                                                <span className={`px-2 py-1 text-xs rounded-full font-medium ${getStatusBadgeColor(member.isApproved)}`}>
+                                                    {member.isApproved || "Unknown"}
+                                                </span>
                                             </td>
 
-                                            {/* Action Buttons */}
+                                            {/* Restored Status */}
                                             <td className="py-4 px-4 whitespace-nowrap">
-                                                <div className="flex space-x-2">
-                                                    <Link
-                                                        to={`/admin-dashboard/get-detail-member/${member.id}`}
-                                                        className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
-                                                        title="View Details"
-                                                    >
-                                                        <Info size={18} />
-                                                    </Link>
-                                                    <button
-                                                        onClick={() => handleEdit(member.id)}
-                                                        className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
-                                                        title="Edit"
-                                                    >
-                                                        <Edit size={18} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(member.id)}
-                                                        className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
-                                                        title="Delete"
-                                                    >
-                                                        <Trash size={18} />
-                                                    </button>
-                                                </div>
+                                                <span className={`px-2 py-1 text-xs rounded-full font-medium ${member.idRestored ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                                    {member.idRestored ? "Restored" : "Not Restored"}
+                                                </span>
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="10" className="py-8 text-center text-gray-500">
-                                            {familyNewMembersData.length === 0 ? "No data available." : "No members found matching your search."}
+                                        <td colSpan="12" className="py-8 text-center text-gray-500">
+                                            {familyRejectedMembersData.length === 0 ? "No rejected members available." : "No members found matching your search."}
                                         </td>
                                     </tr>
                                 )}
@@ -340,4 +363,4 @@ function NewMember() {
     );
 }
 
-export default NewMember;
+export default RejectedMember;

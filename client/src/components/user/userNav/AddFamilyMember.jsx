@@ -9,7 +9,8 @@ import withReactContent from 'sweetalert2-react-content';
 const WhoMember = {
     Header: "Header",
     Wife: "Wife",
-    Child: "Child"
+    Child: "Child",
+    Other: "Other"
 };
 
 export default function AddFamilyMember() {
@@ -181,7 +182,8 @@ export default function AddFamilyMember() {
     const whoMemberColors = {
         [WhoMember.Header]: { bg: "bg-indigo-100", text: "text-indigo-700", icon: <User size={18} className="text-indigo-600" /> },
         [WhoMember.Wife]: { bg: "bg-pink-100", text: "text-pink-700", icon: <Heart size={18} className="text-pink-600" /> },
-        [WhoMember.Child]: { bg: "bg-cyan-100", text: "text-cyan-700", icon: <Baby size={18} className="text-cyan-600" /> }
+        [WhoMember.Child]: { bg: "bg-cyan-100", text: "text-cyan-700", icon: <Baby size={18} className="text-cyan-600" /> },
+        [WhoMember.Other]: { bg: "bg-gray-100", text: "text-gray-700", icon: <Users size={18} className="text-gray-600" /> }
     };
 
     return (

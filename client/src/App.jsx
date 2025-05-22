@@ -27,6 +27,9 @@ import MarriageDetail from './components/admin/adminNav/MarriageDetail';
 import DeathDetail from './components/admin/adminNav/DeathDetail';
 import DivorceDetail from './components/admin/adminNav/DivorceDetail';
 import NewMember from './components/admin/adminNav/NewMember';
+import RemovedMember from './components/admin/adminNav/RemovedMember';
+import RemovedFamilyMember from './components/user/userNav/RemovedFamilyMember';
+import HeaderSetting from './components/user/userNav/HeaderSetting';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -35,6 +38,7 @@ function App() {
     <Router>
       <Routes>
         <Route path='/' element={<Login />} />
+        <Route path='/header-setting' element={<HeaderSetting />} />
 
         {/* Admin */}
         <Route path="/admin-dashboard" element={<AdminNav />}>
@@ -52,6 +56,7 @@ function App() {
           <Route path='death-detail/:id' element={<DeathDetail />} />
           <Route path='divorce-detail/:id' element={<DivorceDetail />} />
           <Route path='new-member' element={<NewMember />} />
+          <Route path='remove-member' element={<RemovedMember />} />
         </Route>
 
         {/* family header Dashboard */}
@@ -65,6 +70,7 @@ function App() {
           <Route path='certificate/:id' element={<ParentCerteficate />} />
           <Route path='vital-event' element={<VitalEvent />} />
           <Route path='all-document' element={<Documents />} />
+          <Route path='removed-family-member' element={<RemovedFamilyMember />} />
         </Route>
       </Routes>
     </Router>
