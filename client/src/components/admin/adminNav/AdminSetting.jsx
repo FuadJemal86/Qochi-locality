@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Menu, Bell, User, Settings, LogOut, ChevronRight, Moon, X, Sun, Camera } from 'lucide-react';
+import { Menu, Bell, User, Settings, LogOut, ChevronRight, Moon, X, Sun, Camera, Plus, UserPlus } from 'lucide-react';
 import Cookies from 'js-cookie';
 import toast, { Toaster } from 'react-hot-toast';
 import api from '../../../../api';
@@ -10,6 +10,12 @@ function AdminSetting() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
     const [profile, setProfile] = useState({});
+    const [showAddAccount, setShowAddAccount] = useState(false);
+    const [newAccount, setNewAccount] = useState({
+        name: '',
+        email: '',
+        password: ''
+    });
 
     const [editedProfile, setEditedProfile] = useState({ ...profile });
 
@@ -30,6 +36,14 @@ function AdminSetting() {
         });
     };
 
+    const handleNewAccountChange = (e) => {
+        const { name, value } = e.target;
+        setNewAccount({
+            ...newAccount,
+            [name]: value
+        });
+    };
+
     const handleSubmit = () => {
         setProfile({ ...editedProfile });
         setIsEditing(false);
@@ -38,6 +52,15 @@ function AdminSetting() {
     const handleCancel = () => {
         setEditedProfile({ ...profile });
         setIsEditing(false);
+    };
+
+    const handleAddAccountCancel = () => {
+        setNewAccount({
+            name: '',
+            email: '',
+            password: ''
+        });
+        setShowAddAccount(false);
     };
 
     const toggleMobileMenu = () => {
@@ -89,7 +112,6 @@ function AdminSetting() {
     }
 
     const handleEdit = async (c) => {
-
         c.preventDefault()
 
         const formData = new FormData()
@@ -113,6 +135,40 @@ function AdminSetting() {
             toast.error(err.response.data.message)
         }
     }
+
+    const handleAddAccount = async (e) => {
+        e.preventDefault();
+
+        // Validation
+        if (!newAccount.name || !newAccount.email || !newAccount.password) {
+            toast.error('Please fill in all fields');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('name', newAccount.name);
+        formData.append('email', newAccount.email);
+        formData.append('password', newAccount.password);
+
+        try {
+            const result = await api.post('/admin/add-account', formData);
+
+            if (result.data.status) {
+                toast.success(result.data.message || 'Account created successfully');
+                setNewAccount({
+                    name: '',
+                    email: '',
+                    password: ''
+                });
+                setShowAddAccount(false);
+            } else {
+                toast.error(result.data.message);
+            }
+        } catch (err) {
+            console.log(err);
+            toast.error(err.response?.data?.message || 'Failed to create account');
+        }
+    };
 
     const handleLogout = async () => {
         try {
@@ -223,7 +279,97 @@ function AdminSetting() {
                             <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>Profile</span>
                         </nav>
 
-                        {/* Content */}
+                        {/* Action Buttons */}
+                        <div className="mb-6 flex justify-end">
+                            <button
+                                onClick={() => setShowAddAccount(true)}
+                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out flex items-center"
+                            >
+                                <UserPlus size={16} className="mr-2" />
+                                Add Account
+                            </button>
+                        </div>
+
+                        {/* Add Account Form */}
+                        {showAddAccount && (
+                            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md rounded-lg overflow-hidden mb-6`}>
+                                <div className="p-6 md:p-8">
+                                    <h2 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mb-6`}>Add New Account</h2>
+
+                                    <form onSubmit={handleAddAccount}>
+                                        <div className={`${darkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg p-5 mb-6`}>
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label htmlFor="new-name" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
+                                                        Full Name *
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        id="new-name"
+                                                        name="name"
+                                                        value={newAccount.name}
+                                                        onChange={handleNewAccountChange}
+                                                        required
+                                                        className={`w-full px-3 py-2 border ${darkMode ? 'bg-gray-800 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} rounded-md focus:outline-none focus:ring-2 focus:ring-green-500`}
+                                                        placeholder="Enter full name"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label htmlFor="new-email" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
+                                                        Email Address *
+                                                    </label>
+                                                    <input
+                                                        type="email"
+                                                        id="new-email"
+                                                        name="email"
+                                                        value={newAccount.email}
+                                                        onChange={handleNewAccountChange}
+                                                        required
+                                                        className={`w-full px-3 py-2 border ${darkMode ? 'bg-gray-800 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} rounded-md focus:outline-none focus:ring-2 focus:ring-green-500`}
+                                                        placeholder="Enter email address"
+                                                    />
+                                                </div>
+
+                                                <div>
+                                                    <label htmlFor="new-password" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
+                                                        Password *
+                                                    </label>
+                                                    <input
+                                                        type="password"
+                                                        id="new-password"
+                                                        name="password"
+                                                        value={newAccount.password}
+                                                        onChange={handleNewAccountChange}
+                                                        required
+                                                        className={`w-full px-3 py-2 border ${darkMode ? 'bg-gray-800 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} rounded-md focus:outline-none focus:ring-2 focus:ring-green-500`}
+                                                        placeholder="Enter password"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center justify-end space-x-3">
+                                            <button
+                                                type="button"
+                                                onClick={handleAddAccountCancel}
+                                                className={`${darkMode ? 'bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'} border px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out`}
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out"
+                                            >
+                                                Create Account
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Profile Content */}
                         <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md rounded-lg overflow-hidden`}>
                             <div className="p-6 md:p-8">
                                 <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'} mb-6`}>Profile Settings</h1>

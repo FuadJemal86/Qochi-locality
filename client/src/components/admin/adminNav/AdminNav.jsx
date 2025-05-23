@@ -174,16 +174,18 @@ export default function AdminNav() {
                     <ul className="space-y-2 px-2">
                         {/* Dashboard */}
                         <li>
-                            <NavItem
-                                icon={<Home className="h-5 w-5" />}
-                                label="Dashboard"
-                                id="dashboard"
-                                isActive={activeItem === 'dashboard'}
-                                onClick={() => {
-                                    setActiveItem('dashboard');
-                                    if (isMobile) setSidebarOpen(false);
-                                }}
-                            />
+                            <Link to={'/admin-dashboard'}>
+                                <NavItem
+                                    icon={<Home className="h-5 w-5" />}
+                                    label="Dashboard"
+                                    id="dashboard"
+                                    isActive={activeItem === 'dashboard'}
+                                    onClick={() => {
+                                        setActiveItem('dashboard');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                />
+                            </Link>
                         </li>
 
                         <li>

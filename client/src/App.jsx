@@ -31,6 +31,7 @@ import RemovedMember from './components/admin/adminNav/RemovedMember';
 import RemovedFamilyMember from './components/user/userNav/RemovedFamilyMember';
 import HeaderSetting from './components/user/userNav/HeaderSetting';
 import AdminSetting from './components/admin/adminNav/AdminSetting';
+import AdminDashbord from './components/admin/adminNav/AdminDashbord';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -59,6 +60,7 @@ function App() {
           <Route path='divorce-detail/:id' element={<DivorceDetail />} />
           <Route path='new-member' element={<NewMember />} />
           <Route path='remove-member' element={<RemovedMember />} />
+          <Route path='' element={<AdminDashbord />} />
         </Route>
 
         {/* family header Dashboard */}

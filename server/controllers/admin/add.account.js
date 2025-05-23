@@ -1,20 +1,9 @@
-const path = require('path');
-const multer = require('multer');
+
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const prisma = require('../../prismaClieynt');
+const upload = require('../../upload');
 
-// Configure multer storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/images');
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = 'admin_' + Date.now() + path.extname(file.originalname);
-        cb(null, uniqueSuffix);
-    }
-});
-const upload = multer({ storage: storage });
 
 // Add Admin Account
 const addAccount = [upload.single('image'), async (req, res) => {
@@ -55,10 +44,10 @@ const addAccount = [upload.single('image'), async (req, res) => {
             sameSite: 'lax',
         });
 
-        res.status(201).json({ success: true, message: 'Admin account created successfully' });
+        res.status(201).json({ status: true, message: 'Admin account created successfully' });
     } catch (err) {
         console.error('Error creating admin account:', err.message);
-        res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
+        res.status(500).json({ status: false, message: 'Internal server error', error: err.message });
     }
 }];
 
