@@ -4,6 +4,7 @@ import { Edit, Trash, Info, UserPlus, X, Search, ChevronLeft, ChevronRight, Prin
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../../../../api';
+import Swal from 'sweetalert2';
 
 function FmailyMembers() {
     const navigate = useNavigate()
@@ -66,8 +67,34 @@ function FmailyMembers() {
     };
 
     const handleDelete = (id) => {
-        // Handle delete logic here
-        console.log(`Delete family with ID: ${id}`);
+        try {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            })
+
+                .then(async (result) => {
+                    if (result.isConfirmed) {
+                        const response = await api.put(`/user/delete-member/${id}`)
+                        if (response.data.status) {
+                            fetchData()
+                            Swal.fire({
+                                title: "Deleted!",
+                                text: "Your file has been deleted.",
+                                icon: "success"
+                            });
+                        }
+                    }
+                })
+
+        } catch (err) {
+            console.log(err)
+        }
     };
 
     const formatDate = (dateString) => {
@@ -81,20 +108,21 @@ function FmailyMembers() {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const result = await api.get('/user/get-members');
-                if (result.data.status) {
-                    setFamilyHeadsData(result.data.familyMembers);
-                } else {
-                    console.log(result.data.message);
-                }
-            } catch (err) {
-                console.error('Error fetching family headers:', err);
-            }
-        };
         fetchData();
     }, []);
+
+    const fetchData = async () => {
+        try {
+            const result = await api.get('/user/get-members');
+            if (result.data.status) {
+                setFamilyHeadsData(result.data.familyMembers);
+            } else {
+                console.log(result.data.message);
+            }
+        } catch (err) {
+            console.error('Error fetching family headers:', err);
+        }
+    };
 
     // print the customer table
     const handlePrint = () => {

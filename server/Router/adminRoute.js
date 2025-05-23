@@ -30,6 +30,8 @@ const { getDivorceDetail } = require('../controllers/admin/divorceDetail')
 const { geNewtMembers } = require('../controllers/admin/getNewMember')
 const { getRemoveMembers } = require('../controllers/admin/getRemoveMember')
 const { getRejectMembers } = require('../controllers/admin/getRejectMember')
+const { getProfile } = require('../controllers/admin/getProfile')
+const { editAdminProfile } = require('../controllers/admin/editAdminProfile')
 
 const router = express.Router()
 
@@ -57,6 +59,7 @@ router.get('/get-divorce-certificate', getDivorceCertificate)
 router.get('/get-new-member', geNewtMembers)
 router.get('/get-removed-member', getRemoveMembers)
 router.get('/get-reject-member', getRejectMembers)
+router.get('/get-profile', getProfile)
 
 // certificate detail info
 router.get('/get-birth-detail/:id', getBirthDetail)
@@ -71,6 +74,8 @@ router.put('/birth-certificate-approval/:id', birthCertificateApprove)
 router.put('/marriage-certificate-approval/:id', marriageCertificateApprove)
 router.put('/death-certificate-approval/:id', deathCertificationApprove)
 router.put('/divorce-certificate-approval/:id', divorceCertificateApprove)
+router.put('/edit-profile', editAdminProfile)
+
 
 
 module.exports = router

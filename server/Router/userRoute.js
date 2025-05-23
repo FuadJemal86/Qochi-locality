@@ -14,6 +14,8 @@ const { requestDivorceCertificate } = require('../controllers/user/divorceCertif
 const { getAllDocuments } = require('../controllers/user/getAllDocumets')
 const { getRemoveMembers } = require('../controllers/user/getRemovedMembers')
 const { getProfile } = require('../controllers/user/getProfile')
+const { editHeaderProfile } = require('../controllers/user/editProfile')
+const { deleteMember } = require('../controllers/user/deleteMember')
 
 const router = express.Router()
 
@@ -35,6 +37,12 @@ router.get('/get-vital-event', getVitalEvent)
 router.get('/get-all-documents', getAllDocuments)
 router.get('/get-removed-member', getRemoveMembers)
 router.get('/get-profile', getProfile)
+
+
+router.put('/edit-profile', editHeaderProfile)
+
+
+router.put('/delete-member/:id', deleteMember)
 
 
 module.exports = router

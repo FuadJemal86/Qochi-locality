@@ -156,17 +156,6 @@ function VitalEvent() {
                             />
                             <Search size={18} className="absolute left-3 top-2.5 text-gray-400" />
                         </div>
-                        <Link
-                            to={'/family-head-dashboard/for-header'}
-                            onClick={() => setShowForYou(!showForYou)}
-                            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${showForYou
-                                ? "bg-purple-600 text-white hover:bg-purple-700"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                }`}
-                        >
-                            <Heart size={18} className={showForYou ? "text-white" : "text-purple-500"} />
-                            <span>For You</span>
-                        </Link>
                     </div>
                 </div>
 

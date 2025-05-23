@@ -5,7 +5,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import api from '../../../../api';
 
 
-function HeaderSetting() {
+function AdminSetting() {
     const [isEditing, setIsEditing] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
@@ -70,11 +70,11 @@ function HeaderSetting() {
 
     const fetchData = async () => {
         try {
-            const result = await api.get('/user/get-profile')
+            const result = await api.get('/admin/get-profile')
             if (result.data.status) {
                 // Map the API response to match component expectations
                 const profileData = {
-                    name: result.data.getProfile.fullName,
+                    name: result.data.getProfile.name,
                     email: result.data.getProfile.email,
                     image: result.data.getProfile.image
                 };
@@ -99,7 +99,7 @@ function HeaderSetting() {
         formData.append('image', editedProfile.image || '')
 
         try {
-            const result = await api.put('/user/edit-profile', formData)
+            const result = await api.put('/admin/edit-profile', formData)
 
             if (result.data.status) {
                 toast.success(result.data.message)
@@ -139,7 +139,7 @@ function HeaderSetting() {
                                 <Menu size={24} />
                             </button>
                             <div className="hidden md:block">
-                                <div className={`text-xl font-semibold ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>HeaderOS</div>
+                                <div className={`text-xl font-semibold ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>AdminOS</div>
                             </div>
                         </div>
 
@@ -218,7 +218,7 @@ function HeaderSetting() {
                     <div className="max-w-3xl mx-auto">
                         {/* Breadcrumb */}
                         <nav className="mb-5 flex items-center text-sm text-gray-500 dark:text-gray-400">
-                            <a href="/family-head-dashboard" className={`hover:${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Dashboard</a>
+                            <a href="/admin-dashboard" className={`hover:${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Dashboard</a>
                             <ChevronRight size={16} className="mx-2" />
                             <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>Profile</span>
                         </nav>
@@ -384,4 +384,4 @@ function HeaderSetting() {
     );
 }
 
-export default HeaderSetting
+export default AdminSetting

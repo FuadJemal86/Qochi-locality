@@ -27,6 +27,7 @@ import {
     Folder,
     UserMinus
 } from 'lucide-react';
+import api from '../../../../api';
 
 export default function FamilyHeaderNav() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -34,6 +35,7 @@ export default function FamilyHeaderNav() {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [activeItem, setActiveItem] = useState('dashboard');
     const [isMobile, setIsMobile] = useState(false);
+    const [profile, setProfile] = useState([])
     const location = useLocation();
 
     // Update active item based on current route
@@ -97,6 +99,7 @@ export default function FamilyHeaderNav() {
         }
     };
 
+
     // Navigation item component with improved focus effects
     const NavItem = ({ icon, label, id, hasDropdown = false, onClick, isActive, children }) => {
         return (
@@ -157,6 +160,22 @@ export default function FamilyHeaderNav() {
         };
         return displayNames[itemId] || itemId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     };
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const result = await api.get('/user/get-profile')
+                if (result.data.status) {
+                    setProfile(result.data.getProfile)
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        fetchProfile()
+    }, [])
 
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
@@ -351,12 +370,24 @@ export default function FamilyHeaderNav() {
                             </button>
 
                             <div className="flex items-center gap-3">
-                                <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 relative">
-                                    <CircleUser className="h-6 w-6" />
-                                </button>
                                 <Link to={'/header-setting'} className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 relative">
                                     <Settings className="h-6 w-6" />
                                 </Link>
+                                <div className="flex items-center">
+                                    {
+                                        profile.image?.length > 0 ? (
+                                            <img
+                                                src={`http://localhost:3032/uploads/members/${profile.image}`}
+                                                alt="Profile"
+                                                className="h-8 w-8 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                                <User size={20} className="text-gray-600" />
+                                            </div>
+                                        )
+                                    }
+                                </div>
                             </div>
                         </div>
                     </div>

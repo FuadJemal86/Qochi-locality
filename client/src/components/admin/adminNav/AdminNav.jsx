@@ -25,6 +25,7 @@ import {
     IdCard,
     Videotape
 } from 'lucide-react';
+import api from '../../../../api';
 
 export default function AdminNav() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -32,6 +33,8 @@ export default function AdminNav() {
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [activeItem, setActiveItem] = useState('dashboard');
     const [isMobile, setIsMobile] = useState(false);
+    const [profile, setProfile] = useState([]);
+
 
     // Check for mobile screen size
     useEffect(() => {
@@ -111,6 +114,27 @@ export default function AdminNav() {
             </button>
         );
     };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const result = await api.get('/admin/get-profile')
+                if (result.data.status) {
+                    const profileData = {
+                        name: result.data.getProfile.name,
+                        email: result.data.getProfile.email,
+                        image: result.data.getProfile.image
+                    };
+                    setProfile(profileData);
+                } else {
+                    console.log(result.data.message)
+                }
+            } catch (err) {
+                console.log(err)
+            }
+        }
+        fetchData()
+    }, [])
 
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">
@@ -281,16 +305,18 @@ export default function AdminNav() {
                         </li>
 
                         <li>
-                            <NavItem
-                                icon={<Settings className="h-5 w-5" />}
-                                label="Setting"
-                                id="setting"
-                                isActive={activeItem === 'setting'}
-                                onClick={() => {
-                                    setActiveItem('setting');
-                                    if (isMobile) setSidebarOpen(false);
-                                }}
-                            />
+                            <Link to={'/admin-profile'}>
+                                <NavItem
+                                    icon={<Settings className="h-5 w-5" />}
+                                    label="Setting"
+                                    id="setting"
+                                    isActive={activeItem === 'setting'}
+                                    onClick={() => {
+                                        setActiveItem('setting');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                />
+                            </Link>
                         </li>
                     </ul>
                 </div>
@@ -323,12 +349,24 @@ export default function AdminNav() {
                             </button>
 
                             <div className="flex items-center gap-3">
-                                <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none relative">
-                                    <CircleUser className="h-6 w-6" />
-                                </button>
-                                <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none relative">
+                                <Link to={'/admin-profile'} className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none relative">
                                     <Settings className="h-6 w-6" />
-                                </button>
+                                </Link>
+                                <div className="flex items-center">
+                                    {
+                                        profile.image?.length > 0 ? (
+                                            <img
+                                                src={`http://localhost:3032/uploads/members/${profile.image}`}
+                                                alt="Profile"
+                                                className="h-8 w-8 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                                <User size={20} className="text-gray-600" />
+                                            </div>
+                                        )
+                                    }
+                                </div>
                             </div>
                         </div>
                     </div>

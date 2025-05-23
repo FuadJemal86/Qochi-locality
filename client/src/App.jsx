@@ -30,6 +30,7 @@ import NewMember from './components/admin/adminNav/NewMember';
 import RemovedMember from './components/admin/adminNav/RemovedMember';
 import RemovedFamilyMember from './components/user/userNav/RemovedFamilyMember';
 import HeaderSetting from './components/user/userNav/HeaderSetting';
+import AdminSetting from './components/admin/adminNav/AdminSetting';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -39,6 +40,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Login />} />
         <Route path='/header-setting' element={<HeaderSetting />} />
+        <Route path='/admin-profile' element={<AdminSetting />} />
 
         {/* Admin */}
         <Route path="/admin-dashboard" element={<AdminNav />}>
