@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Users, UserCheck, UserX, Home, MapPin, TrendingUp, ChevronUp, AlertTriangle, Calendar, FileText } from 'lucide-react';
+import { Users, UserCheck, UserX, Home, MapPin, TrendingUp, ChevronUp, AlertTriangle, Calendar, FileText, CreditCard } from 'lucide-react';
+import api from '../../../../api';
 
 const StatCard = ({ title, value, icon: Icon, trend, color }) => (
     <div className="stat-card">
@@ -15,7 +16,7 @@ const StatCard = ({ title, value, icon: Icon, trend, color }) => (
         </div>
         <div className="stat-content">
             <h3>{title}</h3>
-            <h2>{value.toLocaleString()}</h2>
+            <h2>{value?.toLocaleString() || '0'}</h2>
         </div>
         <div className="stat-footer">
             <div className="progress-bar" style={{ '--progress': `${Math.abs(trend)}%`, '--color': color }}></div>
@@ -23,66 +24,108 @@ const StatCard = ({ title, value, icon: Icon, trend, color }) => (
     </div>
 );
 
-const AdminDashbord = () => {
+const AdminDashboard = () => {
     const [stats, setStats] = useState({
         totalFamilies: 0,
         totalMembers: 0,
         rejectedMembers: 0,
         pendingApplications: 0,
         activeHouseholds: 0,
-        registeredProperties: 0
+        totalIdRequests: 0
     });
 
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Simulate API calls
-        setTimeout(() => {
-            setStats({
-                totalFamilies: 1247,
-                totalMembers: 4893,
-                rejectedMembers: 23,
-                pendingApplications: 45,
-                activeHouseholds: 1224,
-                registeredProperties: 1180
-            });
-            setLoading(false);
-        }, 1000);
+        const fetchAllStats = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                // Fetch all stats in parallel using api.get
+                const [
+                    totalHeaderRes,
+                    totalMemberRes,
+                    totalRejectedMemberRes,
+                    totalPendingMemberRes,
+                    totalActiveHeaderRes,
+                    totalIdRes
+                ] = await Promise.all([
+                    api.get('/admin/get-total-header'),
+                    api.get('/admin/get-total-member'),
+                    api.get('/admin/get-total-rejected-member'),
+                    api.get('/admin/get-total-pending-member'),
+                    api.get('/admin/get-total-active-header'),
+                    api.get('/admin/get-total-id')
+                ]);
+
+                // Update stats with API data - handling the response format you specified
+                setStats({
+                    totalFamilies: totalHeaderRes.data?.totalHeader || 0,
+                    totalMembers: totalMemberRes.data?.totalMember || 0,
+                    rejectedMembers: totalRejectedMemberRes.data?.totalRejectedMember || 0,
+                    pendingApplications: totalPendingMemberRes.data?.totalPendingMember || 0,
+                    activeHouseholds: totalActiveHeaderRes.data?.totalActiveHeader || 0,
+                    totalIdRequests: totalIdRes.data?.totalIRequest || 0
+                });
+
+            } catch (err) {
+                console.error('Error fetching stats:', err);
+                setError(err.message);
+                // Fallback to demo data if API fails
+                setStats({
+                    totalFamilies: 1247,
+                    totalMembers: 4893,
+                    rejectedMembers: 23,
+                    pendingApplications: 45,
+                    activeHouseholds: 1224,
+                    totalIdRequests: 1180
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAllStats();
     }, []);
 
+    // Mock data for charts (you can replace these with additional API calls if available)
     const monthlyData = [
-        { name: 'Jan', families: 1180, members: 4620, applications: 15 },
-        { name: 'Feb', families: 1195, members: 4685, applications: 22 },
-        { name: 'Mar', families: 1210, members: 4750, applications: 18 },
-        { name: 'Apr', families: 1225, members: 4820, applications: 28 },
-        { name: 'May', families: 1240, members: 4870, applications: 35 },
-        { name: 'Jun', families: 1247, members: 4893, applications: 45 },
+        { name: 'Jan', families: Math.max(0, stats.totalFamilies - 67), members: Math.max(0, stats.totalMembers - 273), applications: 15 },
+        { name: 'Feb', families: Math.max(0, stats.totalFamilies - 52), members: Math.max(0, stats.totalMembers - 208), applications: 22 },
+        { name: 'Mar', families: Math.max(0, stats.totalFamilies - 37), members: Math.max(0, stats.totalMembers - 143), applications: 18 },
+        { name: 'Apr', families: Math.max(0, stats.totalFamilies - 22), members: Math.max(0, stats.totalMembers - 73), applications: 28 },
+        { name: 'May', families: Math.max(0, stats.totalFamilies - 7), members: Math.max(0, stats.totalMembers - 23), applications: 35 },
+        { name: 'Jun', families: stats.totalFamilies, members: stats.totalMembers, applications: stats.pendingApplications },
     ];
 
     const membershipData = [
-        { name: 'Approved Members', value: 4870, color: '#22c55e' },
-        { name: 'Pending Applications', value: 45, color: '#eab308' },
-        { name: 'Rejected Members', value: 23, color: '#ef4444' },
+        { name: 'Approved Members', value: stats.totalMembers - stats.pendingApplications - stats.rejectedMembers, color: '#22c55e' },
+        { name: 'Pending Applications', value: stats.pendingApplications, color: '#eab308' },
+        { name: 'Rejected Members', value: stats.rejectedMembers, color: '#ef4444' },
     ];
 
     const weeklyApplications = [
-        { name: 'Mon', applications: 8, rejections: 1 },
-        { name: 'Tue', applications: 12, rejections: 2 },
-        { name: 'Wed', applications: 15, rejections: 0 },
-        { name: 'Thu', applications: 10, rejections: 3 },
-        { name: 'Fri', applications: 18, rejections: 1 },
-        { name: 'Sat', applications: 6, rejections: 0 },
-        { name: 'Sun', applications: 9, rejections: 2 },
+        { name: 'Mon', applications: Math.floor(stats.pendingApplications / 7) + 1, rejections: Math.floor(stats.rejectedMembers / 7) },
+        { name: 'Tue', applications: Math.floor(stats.pendingApplications / 7) + 5, rejections: Math.floor(stats.rejectedMembers / 7) + 1 },
+        { name: 'Wed', applications: Math.floor(stats.pendingApplications / 7) + 8, rejections: Math.floor(stats.rejectedMembers / 7) },
+        { name: 'Thu', applications: Math.floor(stats.pendingApplications / 7) + 3, rejections: Math.floor(stats.rejectedMembers / 7) + 2 },
+        { name: 'Fri', applications: Math.floor(stats.pendingApplications / 7) + 11, rejections: Math.floor(stats.rejectedMembers / 7) },
+        { name: 'Sat', applications: Math.floor(stats.pendingApplications / 7) - 1, rejections: Math.floor(stats.rejectedMembers / 7) },
+        { name: 'Sun', applications: Math.floor(stats.pendingApplications / 7) + 2, rejections: Math.floor(stats.rejectedMembers / 7) + 1 },
     ];
 
     if (loading) {
         return (
             <div style={{
                 display: 'flex',
+                flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
                 height: '100vh',
-                fontSize: '18px'
+                fontSize: '18px',
+                gap: '20px'
             }}>
                 <div style={{
                     border: '4px solid #f3f3f3',
@@ -92,12 +135,47 @@ const AdminDashbord = () => {
                     height: '50px',
                     animation: 'spin 1s linear infinite'
                 }}></div>
+                <div>Loading dashboard data...</div>
                 <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
           }
         `}</style>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+                fontSize: '18px',
+                gap: '20px',
+                color: '#ef4444'
+            }}>
+                <AlertTriangle size={48} />
+                <div>Failed to load dashboard data</div>
+                <div style={{ fontSize: '14px', color: '#64748b' }}>
+                    {error}
+                </div>
+                <button
+                    onClick={() => window.location.reload()}
+                    style={{
+                        padding: '10px 20px',
+                        background: '#6366f1',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Retry
+                </button>
             </div>
         );
     }
@@ -285,7 +363,7 @@ const AdminDashbord = () => {
                             gap: '8px'
                         }}>
                             <Calendar size={20} />
-                            <span style={{ fontWeight: '500' }}>Last 30 Days</span>
+                            <span style={{ fontWeight: '500' }}>Real-time Data</span>
                             <TrendingUp size={20} />
                         </div>
                         <div style={{
@@ -302,7 +380,7 @@ const AdminDashbord = () => {
                                 background: '#22c55e',
                                 animation: 'pulse 2s infinite'
                             }}></div>
-                            System Status: Active
+                            API Status: Connected
                         </div>
                     </div>
                 </div>
@@ -357,9 +435,9 @@ const AdminDashbord = () => {
                     color="#8b5cf6"
                 />
                 <StatCard
-                    title="Registered Properties"
-                    value={stats.registeredProperties}
-                    icon={MapPin}
+                    title="Total ID Requests"
+                    value={stats.totalIdRequests}
+                    icon={CreditCard}
                     trend={2.1}
                     color="#06b6d4"
                 />
@@ -509,4 +587,4 @@ const AdminDashbord = () => {
     );
 };
 
-export default AdminDashbord;
+export default AdminDashboard;

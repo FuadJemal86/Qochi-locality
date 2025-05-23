@@ -32,6 +32,7 @@ import RemovedFamilyMember from './components/user/userNav/RemovedFamilyMember';
 import HeaderSetting from './components/user/userNav/HeaderSetting';
 import AdminSetting from './components/admin/adminNav/AdminSetting';
 import AdminDashbord from './components/admin/adminNav/AdminDashbord';
+import FamilyHeaderDashboard from './components/user/userNav/FamilyHeaderDashboard';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -45,6 +46,7 @@ function App() {
 
         {/* Admin */}
         <Route path="/admin-dashboard" element={<AdminNav />}>
+          <Route path='' element={<AdminDashbord />} />
           <Route path='family-headers' element={<FamilyHeaders />} />
           <Route path='add-family-header' element={<AddFamilyHeader />} />
           <Route path='family-members' element={<AdminFmailyMembers />} />
@@ -60,11 +62,11 @@ function App() {
           <Route path='divorce-detail/:id' element={<DivorceDetail />} />
           <Route path='new-member' element={<NewMember />} />
           <Route path='remove-member' element={<RemovedMember />} />
-          <Route path='' element={<AdminDashbord />} />
         </Route>
 
         {/* family header Dashboard */}
         <Route path="/family-head-dashboard" element={<FamilyHeaderNav />}>
+          <Route path='' element={<FamilyHeaderDashboard />} />
           <Route path='family-members' element={<FmailyMembers />} />
           <Route path='add-family-members' element={<AddFamilyMember />} />
           <Route path='rejected-memebrs' element={<RejectedMember />} />

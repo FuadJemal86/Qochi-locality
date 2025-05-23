@@ -32,6 +32,12 @@ const { getRemoveMembers } = require('../controllers/admin/getRemoveMember')
 const { getRejectMembers } = require('../controllers/admin/getRejectMember')
 const { getProfile } = require('../controllers/admin/getProfile')
 const { editAdminProfile } = require('../controllers/admin/editAdminProfile')
+const { totalHeader } = require('../controllers/admin/getTotalHeader')
+const { totalMember } = require('../controllers/admin/getTotalMember')
+const { totalRejectedMember } = require('../controllers/admin/getTotalRejectedMember')
+const { totalPendingMember } = require('../controllers/admin/getPendingMember')
+const { totalActiveHeader } = require('../controllers/admin/getActiveHeader')
+const { totalIRequest } = require('../controllers/admin/getTotalIdRequest')
 
 const router = express.Router()
 
@@ -61,6 +67,14 @@ router.get('/get-removed-member', getRemoveMembers)
 router.get('/get-reject-member', getRejectMembers)
 router.get('/get-profile', getProfile)
 
+// dashboard 
+
+router.get('/get-total-header', totalHeader)
+router.get('/get-total-member', totalMember)
+router.get('/get-total-rejected-member', totalRejectedMember)
+router.get('/get-total-pending-member', totalPendingMember)
+router.get('/get-total-active-header', totalActiveHeader)
+router.get('/get-total-id', totalIRequest)
 // certificate detail info
 router.get('/get-birth-detail/:id', getBirthDetail)
 router.get('/get-marriage-detail/:id', getDetailMarriage)

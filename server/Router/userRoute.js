@@ -16,6 +16,9 @@ const { getRemoveMembers } = require('../controllers/user/getRemovedMembers')
 const { getProfile } = require('../controllers/user/getProfile')
 const { editHeaderProfile } = require('../controllers/user/editProfile')
 const { deleteMember } = require('../controllers/user/deleteMember')
+const { totalMember } = require('../controllers/user/getTotalHeaderMembers')
+const { totalRejectedMember } = require('../controllers/user/getToatalRejectedMember')
+const { totalActiveMember } = require('../controllers/user/getActiveMember')
 
 const router = express.Router()
 
@@ -37,6 +40,12 @@ router.get('/get-vital-event', getVitalEvent)
 router.get('/get-all-documents', getAllDocuments)
 router.get('/get-removed-member', getRemoveMembers)
 router.get('/get-profile', getProfile)
+
+// dashboard
+router.get('/get-total-members', totalMember)
+router.get('/get-rejected-members', totalRejectedMember)
+router.get('/get-active-members', totalActiveMember)
+router.get('/get-pending-members', totalActiveMember)
 
 
 router.put('/edit-profile', editHeaderProfile)
