@@ -34,6 +34,7 @@ import AdminSetting from './components/admin/adminNav/AdminSetting';
 import AdminDashbord from './components/admin/adminNav/AdminDashbord';
 import FamilyHeaderDashboard from './components/user/userNav/FamilyHeaderDashboard';
 import RemovedHeader from './components/admin/adminNav/RemovedHeader';
+import Home from './components/HomeComponent/Home';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -41,7 +42,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path='/' element={<Login />} />
+        <Route path='/' element={<Home />} />
+        <Route path='/login' element={<Login />} />
         <Route path='/header-setting' element={<HeaderSetting />} />
         <Route path='/admin-profile' element={<AdminSetting />} />
 
