@@ -1,4 +1,5 @@
 const prisma = require("../../prismaClieynt")
+const jwt = require('jsonwebtoken')
 
 const totalPendingMember = async (req, res) => {
     const token = req.cookies['fh-auth-token']

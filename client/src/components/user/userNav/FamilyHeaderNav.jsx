@@ -28,6 +28,7 @@ import {
     UserMinus
 } from 'lucide-react';
 import api from '../../../../api';
+import userValidation from '../../../Hookes/userValidation';
 
 export default function FamilyHeaderNav() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -37,6 +38,7 @@ export default function FamilyHeaderNav() {
     const [isMobile, setIsMobile] = useState(false);
     const [profile, setProfile] = useState([])
     const location = useLocation();
+    userValidation()
 
     // Update active item based on current route
     useEffect(() => {
@@ -99,21 +101,20 @@ export default function FamilyHeaderNav() {
         }
     };
 
-
-    // Navigation item component with improved focus effects
+    // Navigation item component with simple focus styles
     const NavItem = ({ icon, label, id, hasDropdown = false, onClick, isActive, children }) => {
         return (
             <div>
                 <button
                     onClick={onClick}
-                    className={`flex items-center justify-between w-full px-4 py-3 rounded-md transition-all duration-200 ${isActive
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-300 hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-800'
+                    className={`flex items-center justify-between w-full px-4 py-3 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isActive
+                        ? 'bg-blue-600 text-white focus:ring-blue-300'
+                        : 'text-gray-300 hover:bg-gray-800 hover:text-white focus:bg-gray-800 focus:text-white'
                         }`}
                 >
                     <div className="flex items-center">
                         {icon}
-                        {(!collapsed || isMobile) && <span className={`ml-3 font-medium ${isActive ? 'text-white' : 'group-hover:text-white'}`}>{label}</span>}
+                        {(!collapsed || isMobile) && <span className="ml-3 font-medium">{label}</span>}
                     </div>
                     {(!collapsed || isMobile) && hasDropdown && (
                         <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${activeDropdown === id ? 'transform rotate-180' : ''}`} />
@@ -124,15 +125,15 @@ export default function FamilyHeaderNav() {
         );
     };
 
-    // Dropdown item component
+    // Dropdown item component with simple focus styles
     const DropdownItem = ({ icon, label, id, to, isActive }) => {
         return (
             <li>
                 <Link
                     to={to}
-                    className={`flex items-center px-4 py-2 text-sm rounded-md transition-all duration-200 ${isActive
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-700'
+                    className={`flex items-center px-4 py-2 text-sm rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isActive
+                        ? 'bg-blue-600 text-white focus:ring-blue-300'
+                        : 'text-gray-300 hover:bg-gray-700 hover:text-white focus:bg-gray-700 focus:text-white'
                         }`}
                     onClick={() => {
                         setActiveItem(id);
@@ -351,7 +352,7 @@ export default function FamilyHeaderNav() {
                         <div className="flex items-center">
                             {isMobile && (
                                 <button
-                                    className="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-100"
                                     onClick={toggleSidebar}
                                 >
                                     {sidebarOpen ? <X className="h-6 w-6" /> : <ArrowRight className="h-6 w-6" />}
@@ -364,13 +365,13 @@ export default function FamilyHeaderNav() {
 
                         {/* Header Right */}
                         <div className="flex items-center space-x-4">
-                            <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 relative">
+                            <button className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-100 relative">
                                 <Bell className="h-6 w-6" />
                                 <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
                             </button>
 
                             <div className="flex items-center gap-3">
-                                <Link to={'/header-setting'} className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 relative">
+                                <Link to={'/header-setting'} className="p-2 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-100 relative">
                                     <Settings className="h-6 w-6" />
                                 </Link>
                                 <div className="flex items-center">

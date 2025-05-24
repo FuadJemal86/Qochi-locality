@@ -3,6 +3,7 @@ import { Menu, Bell, User, Settings, LogOut, ChevronRight, Moon, X, Sun, Camera 
 import Cookies from 'js-cookie';
 import toast, { Toaster } from 'react-hot-toast';
 import api from '../../../../api';
+import userValidation from '../../../Hookes/userValidation';
 
 
 function HeaderSetting() {
@@ -10,8 +11,8 @@ function HeaderSetting() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
     const [profile, setProfile] = useState({});
-
     const [editedProfile, setEditedProfile] = useState({ ...profile });
+    userValidation()
 
     // Apply dark mode class to document body
     useEffect(() => {
@@ -116,9 +117,10 @@ function HeaderSetting() {
 
     const handleLogout = async () => {
         try {
-            Cookies.remove('fh-auth-token');
+            await api.post('/user/logout');
 
-            window.location.href = '/';
+            window.location.href = '/login';
+            window.location.reload()
         } catch (err) {
             console.error('Logout failed:', err);
         }

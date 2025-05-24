@@ -50,11 +50,6 @@ function RemovedHeader() {
     };
 
     const handleEdit = (id) => {
-        // Handle edit logic here
-        console.log(`Edit family with ID: ${id}`);
-    };
-
-    const handleDelete = (id) => {
         try {
             Swal.fire({
                 title: "Are you sure?",
@@ -63,17 +58,16 @@ function RemovedHeader() {
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!"
+                confirmButtonText: "Yes, restore it!"
             })
-
                 .then(async (result) => {
                     if (result.isConfirmed) {
-                        const response = await api.put(`/admin/delete-header/${id}`)
+                        const response = await api.put(`/admin/restore-header/${id}`)
                         if (response.data.status) {
                             fetchData()
                             Swal.fire({
-                                title: "Deleted!",
-                                text: "Your file has been deleted.",
+                                title: "Restore!",
+                                text: "Your file has been restore.",
                                 icon: "success"
                             });
                         }
@@ -84,6 +78,8 @@ function RemovedHeader() {
             console.log(err)
         }
     };
+
+
 
     const formatDate = (dateString) => {
         if (!dateString) return '';

@@ -26,8 +26,10 @@ import {
     Videotape
 } from 'lucide-react';
 import api from '../../../../api';
+import useValidation from '../../../Hookes/adminValidation';
 
 export default function AdminNav() {
+    useValidation()
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [collapsed, setCollapsed] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
@@ -135,6 +137,8 @@ export default function AdminNav() {
         }
         fetchData()
     }, [])
+
+
 
     return (
         <div className="flex flex-col h-screen lg:flex-row min-h-screen bg-gray-50">

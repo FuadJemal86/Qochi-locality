@@ -3,6 +3,7 @@ import { Menu, Bell, User, Settings, LogOut, ChevronRight, Moon, X, Sun, Camera,
 import Cookies from 'js-cookie';
 import toast, { Toaster } from 'react-hot-toast';
 import api from '../../../../api';
+import useValidation from '../../../Hookes/adminValidation';
 
 
 function AdminSetting() {
@@ -16,8 +17,8 @@ function AdminSetting() {
         email: '',
         password: ''
     });
-
     const [editedProfile, setEditedProfile] = useState({ ...profile });
+    useValidation()
 
     // Apply dark mode class to document body
     useEffect(() => {
@@ -172,13 +173,15 @@ function AdminSetting() {
 
     const handleLogout = async () => {
         try {
-            Cookies.remove('fh-auth-token');
+            await api.post('/admin/logout');
 
-            window.location.href = '/';
+            window.location.href = '/login';
+            window.location.reload()
         } catch (err) {
             console.error('Logout failed:', err);
         }
     };
+
 
     return (
         <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>

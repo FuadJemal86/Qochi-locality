@@ -41,6 +41,10 @@ const { totalIRequest } = require('../controllers/admin/getTotalIdRequest')
 const { deleteHeader } = require('../controllers/admin/deleteHeader')
 const { removeHeader } = require('../controllers/admin/getRemovedHeaders')
 const { deleteMember } = require('../controllers/admin/deleteMember')
+const { restoreMember } = require('../controllers/admin/restoreMember')
+const { restoreHeader } = require('../controllers/admin/restoreHeader')
+const { validation } = require('../controllers/admin/validation')
+const { logout } = require('../controllers/admin/logout')
 
 const router = express.Router()
 
@@ -54,6 +58,12 @@ router.post('/update-marriage-document', uploadMarriageCertification)
 router.post('/update-id-document', uploadIdDocument)
 router.post('/update-death-document', uploadDeathCertification)
 router.post('/update-divorce-document', uploadDivorceCertification)
+
+// validation
+router.post('/validate', validation)
+
+// logout
+router.post('/logout', logout)
 
 router.get('/get-family-header', getFamilyHeader)
 router.get('/get-members', getMembers)
@@ -99,6 +109,12 @@ router.put('/edit-profile', editAdminProfile)
 
 router.put('/delete-header/:id', deleteHeader)
 router.put('/delete-member/:id', deleteMember)
+
+// restore
+
+router.put('/restore-member/:id', restoreMember)
+router.put('/restore-header/:id', restoreHeader)
+
 
 
 

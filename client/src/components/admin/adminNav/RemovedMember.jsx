@@ -5,6 +5,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../../../../api';
 import toast, { Toaster } from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 function RemovedMember() {
     const [searchTerm, setSearchTerm] = useState('');
@@ -46,28 +47,34 @@ function RemovedMember() {
     const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-    const handleEdit = (id) => {
-        // Handle edit logic here
-        console.log(`Edit member with ID: ${id}`);
-    };
-
-    const handleDelete = (id) => {
-        // Handle delete logic here
-        console.log(`Delete member with ID: ${id}`);
-    };
 
     const handleRestore = async (id) => {
         try {
-            const result = await api.put(`/admin/restore-member/${id}`);
-            if (result.data.status) {
-                toast.success("Member restored successfully");
-                fetchData();
-            } else {
-                toast.error(result.data.message || "Failed to restore member");
-            }
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, restore it!"
+            })
+                .then(async (result) => {
+                    if (result.isConfirmed) {
+                        const response = await api.put(`/admin/restore-member/${id}`)
+                        if (response.data.status) {
+                            fetchData()
+                            Swal.fire({
+                                title: "Restore!",
+                                text: "Your file has been restore.",
+                                icon: "success"
+                            });
+                        }
+                    }
+                })
+
         } catch (err) {
-            console.error('Error restoring member:', err);
-            toast.error("An error occurred while restoring member");
+            console.log(err)
         }
     };
 
@@ -155,25 +162,7 @@ function RemovedMember() {
         saveAs(data, "Removed_Members.xlsx");
     };
 
-    const handleApproval = async (value, id) => {
-        try {
-            const result = await api.put(`/admin/member-approval/${id}`, {
-                ...statusState,
-                status: value
-            });
 
-            if (result.data.status) {
-                toast.success(result.data.message);
-                fetchData();
-            } else {
-                console.log(result.data.message);
-                toast.error(result.data.message || "Failed to update status");
-            }
-        } catch (err) {
-            console.log(err);
-            toast.error("An error occurred while updating status");
-        }
-    };
 
     return (
         <div className="p-4 md:p-6 bg-gray-50 min-h-screen">

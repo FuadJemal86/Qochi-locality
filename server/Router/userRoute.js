@@ -19,6 +19,10 @@ const { deleteMember } = require('../controllers/user/deleteMember')
 const { totalMember } = require('../controllers/user/getTotalHeaderMembers')
 const { totalRejectedMember } = require('../controllers/user/getToatalRejectedMember')
 const { totalActiveMember } = require('../controllers/user/getActiveMember')
+const { totalPendingMember } = require('../controllers/user/getPendingMember')
+const { validation } = require('../controllers/user/validation')
+const { logout } = require('../controllers/user/logout')
+
 
 const router = express.Router()
 
@@ -30,6 +34,12 @@ router.post('/request-birth-certificate/:id', requestBirthCertificate)
 router.post('/request-death-certificate/:id', requestDeathCertificate)
 router.post('/request-marriage-certificate/:id', requestMarriageCertificate)
 router.post('/request-divorce-certificate/:id', requestDivorceCertificate)
+
+// validation
+router.post('/validate', validation)
+
+// logout
+router.post('/logout', logout)
 
 
 router.get('/get-members', getMembers)
@@ -45,13 +55,15 @@ router.get('/get-profile', getProfile)
 router.get('/get-total-members', totalMember)
 router.get('/get-rejected-members', totalRejectedMember)
 router.get('/get-active-members', totalActiveMember)
-router.get('/get-pending-members', totalActiveMember)
+router.get('/get-pending-members', totalPendingMember)
 
 
 router.put('/edit-profile', editHeaderProfile)
 
 // remove members
 router.put('/delete-member/:id', deleteMember)
+
+// restore member
 
 
 module.exports = router

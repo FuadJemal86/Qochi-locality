@@ -51,7 +51,7 @@ function VitalEvent() {
     const totalPages = Math.ceil(forYouData.length / itemsPerPage);
 
     const handleIdRequest = (id) => {
-        navigate(`/family-head-dashboard/certificate/${id}`)
+        navigate(`/family-head-dashboard/vital-event/${id}`)
 
     }
 

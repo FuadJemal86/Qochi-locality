@@ -78,7 +78,7 @@ function App() {
           <Route path='id' element={<IdTable />} />
           <Route path='id-request/:id' element={<IDRequest />} />
           <Route path='vital-event' element={<VitalEvent />} />
-          <Route path='certificate/:id' element={<ParentCerteficate />} />
+          <Route path='vital-event/:id' element={<ParentCerteficate />} />
           <Route path='all-document' element={<Documents />} />
           <Route path='removed-family-member' element={<RemovedFamilyMember />} />
         </Route>
