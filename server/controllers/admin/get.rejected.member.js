@@ -5,7 +5,7 @@ const getMemberRejected = async (req, res) => {
 
     try {
         const rejectedMember = await prisma.member.findMany({
-            where: { isApproved: 'REJECTED' }
+            where: { isApproved: 'REJECTED', isRemoved: false }
         })
 
         if (rejectedMember.length === 0) {

@@ -6,7 +6,7 @@ const geNewtMembers = async (req, res) => {
     try {
 
         const familyNewMembers = await prisma.member.findMany({
-            where: { isApproved: 'PENDING' }
+            where: { isApproved: 'PENDING', isRemoved: false }
         })
 
         return res.status(200).json({ status: true, familyNewMembers })

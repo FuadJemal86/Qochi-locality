@@ -1,14 +1,11 @@
 const prisma = require("../../prismaClieynt");
-const jwt = require('jsonwebtoken')
 
 const getMembers = async (req, res) => {
 
     try {
 
-        const familyMembers = await prisma.familyHead.findMany({
-            include: {
-                members: true
-            }
+        const familyMembers = await prisma.member.findMany({
+            where: { isRemoved: false }
         })
 
         return res.status(200).json({ status: true, familyMembers })

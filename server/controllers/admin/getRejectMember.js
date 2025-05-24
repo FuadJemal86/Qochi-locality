@@ -6,7 +6,7 @@ const getRejectMembers = async (req, res) => {
     try {
 
         const familyRejectMembers = await prisma.member.findMany({
-            where: { isApproved: 'REJECTED' }
+            where: { isApproved: 'REJECTED', isRemoved: false }
         })
 
         return res.status(200).json({ status: true, familyRejectMembers })

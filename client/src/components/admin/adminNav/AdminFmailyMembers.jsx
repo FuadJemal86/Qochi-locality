@@ -5,6 +5,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../../../../api';
 import toast, { Toaster } from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 function AdminFamilyMembers() {
     const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -69,8 +70,34 @@ function AdminFamilyMembers() {
     };
 
     const handleDelete = (id) => {
-        // Handle delete logic here
-        console.log(`Delete family with ID: ${id}`);
+        try {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            })
+
+                .then(async (result) => {
+                    if (result.isConfirmed) {
+                        const response = await api.put(`/admin/delete-member/${id}`)
+                        if (response.data.status) {
+                            fetchData()
+                            Swal.fire({
+                                title: "Deleted!",
+                                text: "Your file has been deleted.",
+                                icon: "success"
+                            });
+                        }
+                    }
+                })
+
+        } catch (err) {
+            console.log(err)
+        }
     };
 
     const formatDate = (dateString) => {
@@ -225,85 +252,84 @@ function AdminFamilyMembers() {
                                             </div>
                                         </td>
                                     </tr>
-                                ) : currentItems.length > 0 ? (
-                                    currentItems.map((family) =>
-                                        family.members.map((member) => (
-                                            <tr key={`${family.id}-${member.id}`} className="hover:bg-gray-50 transition-colors duration-150">
-                                                {/* Family ID */}
-                                                <td className="py-4 px-4 whitespace-nowrap">{family.id}</td>
+                                ) : familyHeadsData.length > 0 ? (
+                                    familyHeadsData.map((member) => (
+                                        <tr key={member.id} className="hover:bg-gray-50 transition-colors duration-150">
+                                            {/* Family Member ID */}
+                                            <td className="py-4 px-4 whitespace-nowrap">{member.id}</td>
 
-                                                {/* Family Head Name */}
-                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.fullName || "No Family Name"}</td>
+                                            {/* Full Name */}
+                                            <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.fullName || "No Name"}</td>
 
-                                                {/* Member Name */}
-                                                <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{family.fullName || "No Member Name"}</td>
+                                            {/* Header Name (Head of Family Name) */}
+                                            <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.headId || "No Family Head"}</td>
 
-                                                {/* Member Birth Date */}
-                                                <td className="p-3 text-sm text-gray-500">
-                                                    {member.birthDate
-                                                        ? new Date(member.birthDate).toLocaleDateString("en-GB", {
-                                                            day: "numeric",
-                                                            month: "long",
-                                                            year: "numeric",
-                                                        }).replace(/ /g, ".")
-                                                        : "No Birth Date"}
-                                                </td>
+                                            {/* Birth Date */}
+                                            <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-500">
+                                                {member.birthDate
+                                                    ? new Date(member.birthDate).toLocaleDateString("en-GB", {
+                                                        day: "numeric",
+                                                        month: "long",
+                                                        year: "numeric",
+                                                    }).replace(/ /g, ".")
+                                                    : "No Birth Date"}
+                                            </td>
 
-                                                {/* Relationship */}
-                                                <td className="py-4 px-4 whitespace-nowrap text-gray-700">{member.relationship || "No Relationship"}</td>
+                                            {/* Relationship */}
+                                            <td className="py-4 px-4 whitespace-nowrap text-gray-700">{member.relationship || "No Relationship"}</td>
 
-                                                {/* Member Created At */}
-                                                <td className="p-3 text-sm text-gray-500">
-                                                    {member.createdAt
-                                                        ? new Date(member.createdAt).toLocaleDateString("en-GB", {
-                                                            day: "numeric",
-                                                            month: "long",
-                                                            year: "numeric",
-                                                        }).replace(/ /g, ".")
-                                                        : "No Created Date"}
-                                                </td>
+                                            {/* Created At */}
+                                            <td className="py-4 px-4 text-sm text-gray-500">
+                                                {member.createdAt
+                                                    ? new Date(member.createdAt).toLocaleDateString("en-GB", {
+                                                        day: "numeric",
+                                                        month: "long",
+                                                        year: "numeric",
+                                                    }).replace(/ /g, ".")
+                                                    : "No Created Date"}
+                                            </td>
 
-                                                {/* Approval Status */}
-                                                <td>
-                                                    <select
-                                                        value={member.isApproved || "PENDING"}
-                                                        onChange={e => handleApproval(e.target.value, member.id)}
-                                                        className={`px-2 py-1 rounded-full text-xs font-medium outline-none ${getStatusBadgeColor(member.isApproved)}`}
+                                            {/* Status */}
+                                            <td>
+                                                <select
+                                                    value={member.isApproved || "PENDING"}
+                                                    onChange={(e) => handleApproval(e.target.value, member.id)}
+                                                    className={`px-2 py-1 rounded-full text-xs font-medium outline-none ${getStatusBadgeColor(member.isApproved)}`}
+                                                >
+                                                    <option value="PENDING">PENDING</option>
+                                                    <option value="APPROVED">APPROVED</option>
+                                                    <option value="REJECTED">REJECTED</option>
+                                                </select>
+                                            </td>
+
+                                            {/* Action Buttons */}
+                                            <td className="py-4 px-4 whitespace-nowrap">
+                                                <div className="flex space-x-2">
+                                                    <Link
+                                                        to={`/admin-dashboard/get-detail-member/${member.id}`}
+                                                        className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
+                                                        title="View Details"
                                                     >
-                                                        <option value="PENDING">PENDING</option>
-                                                        <option value="APPROVED">APPROVED</option>
-                                                        <option value="REJECTED">REJECTED</option>
-                                                    </select>
-                                                </td>
-
-                                                {/* Action Buttons */}
-                                                <td className="py-4 px-4 whitespace-nowrap">
-                                                    <div className="flex space-x-2">
-                                                        <Link to={`/admin-dashboard/get-detail-member/${member.id}`}
-                                                            className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
-                                                            title="View Details"
-                                                        >
-                                                            <Info size={18} />
-                                                        </Link>
-                                                        <button
-                                                            onClick={() => handleEdit(member.id)}
-                                                            className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
-                                                            title="Edit"
-                                                        >
-                                                            <Edit size={18} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDelete(member.id)}
-                                                            className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
-                                                            title="Delete"
-                                                        >
-                                                            <Trash size={18} />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )
+                                                        <Info size={18} />
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => handleEdit(member.id)}
+                                                        className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
+                                                        title="Edit"
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(member.id)}
+                                                        className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash size={18} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
                                 ) : (
                                     <tr>
                                         <td colSpan="8" className="py-8 text-center text-gray-500">

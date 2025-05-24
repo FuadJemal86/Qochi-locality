@@ -154,7 +154,6 @@ function RejectedFamilyMember() {
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relation</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
                                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -184,31 +183,7 @@ function RejectedFamilyMember() {
                                                     {family.isApproved}
                                                 </span>
                                             </td>
-                                            <td className="py-4 px-4 whitespace-nowrap">
-                                                <div className="flex space-x-2">
-                                                    <button
-                                                        onClick={() => handleViewDetails(family.id)}
-                                                        className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
-                                                        title="View Details"
-                                                    >
-                                                        <Info size={18} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleEdit(family.id)}
-                                                        className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
-                                                        title="Edit"
-                                                    >
-                                                        <Edit size={18} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(family.id)}
-                                                        className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
-                                                        title="Delete"
-                                                    >
-                                                        <Trash size={18} />
-                                                    </button>
-                                                </div>
-                                            </td>
+
                                         </tr>
                                     ))
                                 ) : (

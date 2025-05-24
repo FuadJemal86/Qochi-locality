@@ -242,20 +242,6 @@ function DeathApproval() {
                                                     >
                                                         <Info size={18} />
                                                     </Link>
-                                                    <button
-                                                        onClick={() => handleEdit(certificate.id)}
-                                                        className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"
-                                                        title="Edit"
-                                                    >
-                                                        <Edit size={18} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(certificate.id)}
-                                                        className="p-1.5 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors duration-200"
-                                                        title="Delete"
-                                                    >
-                                                        <Trash size={18} />
-                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>

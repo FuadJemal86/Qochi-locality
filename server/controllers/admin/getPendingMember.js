@@ -3,7 +3,7 @@ const prisma = require("../../prismaClieynt")
 const totalPendingMember = async (req, res) => {
     try {
         const totalPendingMember = await prisma.member.count({
-            where: { isApproved: 'PENDING' }
+            where: { isApproved: 'PENDING', isRemoved: false }
         })
 
         if (totalPendingMember.length === 0) {

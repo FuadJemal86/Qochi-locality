@@ -40,6 +40,7 @@ const { totalActiveHeader } = require('../controllers/admin/getActiveHeader')
 const { totalIRequest } = require('../controllers/admin/getTotalIdRequest')
 const { deleteHeader } = require('../controllers/admin/deleteHeader')
 const { removeHeader } = require('../controllers/admin/getRemovedHeaders')
+const { deleteMember } = require('../controllers/admin/deleteMember')
 
 const router = express.Router()
 
@@ -97,6 +98,7 @@ router.put('/edit-profile', editAdminProfile)
 // remove header
 
 router.put('/delete-header/:id', deleteHeader)
+router.put('/delete-member/:id', deleteMember)
 
 
 
