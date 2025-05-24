@@ -2,7 +2,9 @@ const prisma = require("../../prismaClieynt")
 
 const getFamilyHeader = async (req, res) => {
     try {
-        const familyHeader = await prisma.familyHead.findMany();
+        const familyHeader = await prisma.familyHead.findMany({
+            where: { isRemoved: false }
+        });
 
         if (familyHeader.length === 0) {
             return res.status(200).json({ status: false, message: 'No family header found' });

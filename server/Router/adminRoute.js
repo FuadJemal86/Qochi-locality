@@ -38,6 +38,8 @@ const { totalRejectedMember } = require('../controllers/admin/getTotalRejectedMe
 const { totalPendingMember } = require('../controllers/admin/getPendingMember')
 const { totalActiveHeader } = require('../controllers/admin/getActiveHeader')
 const { totalIRequest } = require('../controllers/admin/getTotalIdRequest')
+const { deleteHeader } = require('../controllers/admin/deleteHeader')
+const { removeHeader } = require('../controllers/admin/getRemovedHeaders')
 
 const router = express.Router()
 
@@ -66,6 +68,7 @@ router.get('/get-new-member', geNewtMembers)
 router.get('/get-removed-member', getRemoveMembers)
 router.get('/get-reject-member', getRejectMembers)
 router.get('/get-profile', getProfile)
+router.get('/get-removed-header', removeHeader)
 
 // dashboard 
 
@@ -89,6 +92,12 @@ router.put('/marriage-certificate-approval/:id', marriageCertificateApprove)
 router.put('/death-certificate-approval/:id', deathCertificationApprove)
 router.put('/divorce-certificate-approval/:id', divorceCertificateApprove)
 router.put('/edit-profile', editAdminProfile)
+
+
+// remove header
+
+router.put('/delete-header/:id', deleteHeader)
+
 
 
 

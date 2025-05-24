@@ -10,7 +10,7 @@ const user = async (req, res) => {
     }
 
     try {
-        const familyHead = await prisma.familyHead.findUnique({ where: { email } });
+        const familyHead = await prisma.familyHead.findUnique({ where: { email, isRemoved: false } });
 
         if (!familyHead) {
             return res.status(401).json({ loginStatus: false, message: 'Wrong Email or Password' });

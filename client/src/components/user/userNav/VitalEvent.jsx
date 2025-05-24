@@ -51,7 +51,8 @@ function VitalEvent() {
     const totalPages = Math.ceil(forYouData.length / itemsPerPage);
 
     const handleIdRequest = (id) => {
-        navigate(`/family-head-dashboard/id-request/${id}`)
+        navigate(`/family-head-dashboard/certificate/${id}`)
+
     }
 
     const formatDate = (dateString) => {
@@ -123,6 +124,7 @@ function VitalEvent() {
         const data = new Blob([excelBuffer], { type: "application/octet-stream" });
         saveAs(data, "Families.xlsx");
     };
+
 
     return (
         <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
@@ -240,14 +242,13 @@ function VitalEvent() {
                                             </td>
                                             <td className="py-4 px-4 whitespace-nowrap">
                                                 <div className="flex space-x-2">
-                                                    <Link
-                                                        to={`/family-head-dashboard/certificate/${member.id}`}
+                                                    <button
                                                         onClick={() => handleIdRequest(member.id)}
                                                         className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
-                                                        title="Request ID"
+                                                        title="View Details"
                                                     >
                                                         <LucideFileQuestion size={18} />
-                                                    </Link>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>

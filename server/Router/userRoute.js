@@ -50,7 +50,7 @@ router.get('/get-pending-members', totalActiveMember)
 
 router.put('/edit-profile', editHeaderProfile)
 
-
+// remove members
 router.put('/delete-member/:id', deleteMember)
 
 

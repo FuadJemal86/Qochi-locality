@@ -203,6 +203,21 @@ export default function AdminNav() {
                             </Link>
                         </li>
 
+                        <li>
+                            <Link to={'/admin-dashboard/removed-header'}>
+                                <NavItem
+                                    icon={<UserX className="h-5 w-5" />}
+                                    label="Removed Headers"
+                                    id="Removed-headers"
+                                    isActive={activeItem === 'removed-headers'}
+                                    onClick={() => {
+                                        setActiveItem('removed-headers');
+                                        if (isMobile) setSidebarOpen(false);
+                                    }}
+                                />
+                            </Link>
+                        </li>
+
                         {/* Members - with dropdown for sub-items */}
                         <li>
                             <div>

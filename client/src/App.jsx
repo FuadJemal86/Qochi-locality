@@ -33,6 +33,7 @@ import HeaderSetting from './components/user/userNav/HeaderSetting';
 import AdminSetting from './components/admin/adminNav/AdminSetting';
 import AdminDashbord from './components/admin/adminNav/AdminDashbord';
 import FamilyHeaderDashboard from './components/user/userNav/FamilyHeaderDashboard';
+import RemovedHeader from './components/admin/adminNav/RemovedHeader';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -62,6 +63,7 @@ function App() {
           <Route path='divorce-detail/:id' element={<DivorceDetail />} />
           <Route path='new-member' element={<NewMember />} />
           <Route path='remove-member' element={<RemovedMember />} />
+          <Route path='removed-header' element={<RemovedHeader />} />
         </Route>
 
         {/* family header Dashboard */}
@@ -73,8 +75,8 @@ function App() {
           <Route path='edit-family-member/:id' element={<EditFamilyMemeber />} />
           <Route path='id' element={<IdTable />} />
           <Route path='id-request/:id' element={<IDRequest />} />
-          <Route path='certificate/:id' element={<ParentCerteficate />} />
           <Route path='vital-event' element={<VitalEvent />} />
+          <Route path='certificate/:id' element={<ParentCerteficate />} />
           <Route path='all-document' element={<Documents />} />
           <Route path='removed-family-member' element={<RemovedFamilyMember />} />
         </Route>
