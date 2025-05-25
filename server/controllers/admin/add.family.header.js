@@ -1,9 +1,10 @@
 const path = require('path');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 const prisma = require('../../prismaClieynt');
 
-// Configure multer storage
+// Multer storage configuration
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'public/images');
@@ -14,16 +15,23 @@ const storage = multer.diskStorage({
     }
 });
 
-// File size and type validation
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
+    limits: { fileSize: 2 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
-        // Accept images only
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
             return cb(new Error('Only image files are allowed!'), false);
         }
         cb(null, true);
+    }
+});
+
+// Email sender config
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // or use 'hotmail', 'yahoo', or your SMTP settings
+    auth: {
+        user: 'fuad47722@gmail.com', // replace with your email
+        pass: 'nocl yrmb nnrl cxxk'     // replace with your email's app password
     }
 });
 
@@ -33,7 +41,6 @@ const addFamilyHead = [
         try {
             const { fullName, contactInfo, email, password, houseNumber, familysize, type } = req.body;
 
-            // Validate required fields
             if (!fullName || !contactInfo || !email || !password || !houseNumber || !familysize || !type) {
                 return res.status(400).json({
                     status: false,
@@ -41,7 +48,6 @@ const addFamilyHead = [
                 });
             }
 
-            // Check if email already exists
             const existingFamilyHead = await prisma.familyHead.findUnique({
                 where: { email }
             });
@@ -53,10 +59,8 @@ const addFamilyHead = [
                 });
             }
 
-            // Hash the password
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            // Save Family Head to database
             const familyHead = await prisma.familyHead.create({
                 data: {
                     fullName,
@@ -70,7 +74,22 @@ const addFamilyHead = [
                 }
             });
 
-            // Return success response
+            // ✅ Send the password via email
+            const mailOptions = {
+                from: 'fuad47722@gmail.com',
+                to: email,
+                subject: 'Your Family Head Account Details',
+                text: `Dear ${fullName},\n\nYour account has been successfully created.\n\nEmail: ${email}\nPassword: ${password}\n\nPlease keep this information secure.\n\nThank you.`
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error('Failed to send email:', error);
+                } else {
+                    console.log('Email sent:', info.response);
+                }
+            });
+
             res.status(201).json({
                 status: true,
                 message: 'Family Head account created successfully',
