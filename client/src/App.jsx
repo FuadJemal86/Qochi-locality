@@ -35,6 +35,10 @@ import AdminDashbord from './components/admin/adminNav/AdminDashbord';
 import FamilyHeaderDashboard from './components/user/userNav/FamilyHeaderDashboard';
 import RemovedHeader from './components/admin/adminNav/RemovedHeader';
 import Home from './components/HomeComponent/Home';
+import EditFamilyHeader from './components/admin/adminNav/EditFamilyHeader';
+import EditMember from './components/admin/adminNav/EditMember';
+import EditHeaderMembers from './components/user/userNav/EditHeaderMembers';
+import MemberDetail from './components/admin/adminNav/MemberDetail';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -66,6 +70,9 @@ function App() {
           <Route path='new-member' element={<NewMember />} />
           <Route path='remove-member' element={<RemovedMember />} />
           <Route path='removed-header' element={<RemovedHeader />} />
+          <Route path='edit-header/:id' element={<EditFamilyHeader />} />
+          <Route path='edit-member/:id' element={<EditMember />} />
+          <Route path='member-detail/:id' element={<MemberDetail />} />
         </Route>
 
         {/* family header Dashboard */}
@@ -81,6 +88,7 @@ function App() {
           <Route path='vital-event/:id' element={<ParentCerteficate />} />
           <Route path='all-document' element={<Documents />} />
           <Route path='removed-family-member' element={<RemovedFamilyMember />} />
+          <Route path='family-members/:id' element={<EditHeaderMembers />} />
         </Route>
       </Routes>
     </Router>

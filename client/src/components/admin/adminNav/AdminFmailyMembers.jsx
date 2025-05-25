@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Edit, Trash, Info, UserPlus, X, Search, ChevronLeft, ChevronRight, Printer, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -8,6 +8,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import Swal from 'sweetalert2';
 
 function AdminFamilyMembers() {
+    const navigator = useNavigate()
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [detailMemberData, setDetailMemberData] = useState({});
     const [selectedFamilyId, setSelectedFamilyId] = useState(null);
@@ -66,7 +67,7 @@ function AdminFamilyMembers() {
 
     const handleEdit = (id) => {
         // Handle edit logic here
-        console.log(`Edit family with ID: ${id}`);
+        navigator(`/admin-dashboard/edit-member/${id}`)
     };
 
     const handleDelete = (id) => {

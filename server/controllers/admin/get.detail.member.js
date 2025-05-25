@@ -24,7 +24,7 @@ const getDetailMember = async (req, res) => {
             }
         })
 
-        if (getDetailMember.length === 0) {
+        if (!getDetailMember) {
             return res.status(400).json({ status: false, message: 'no member found in this id' })
         }
 

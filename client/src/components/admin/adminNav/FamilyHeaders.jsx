@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Edit, Trash, Info, UserPlus, X, Search, ChevronLeft, ChevronRight, Printer, FileSpreadsheet } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Edit, Trash, Info, UserPlus, X, Search, ChevronLeft, ChevronRight, Printer, FileSpreadsheet, InfoIcon } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import api from '../../../../api';
 import Swal from 'sweetalert2';
 
 function FamilyHeaders() {
+    const navigator = useNavigate()
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [selectedFamilyId, setSelectedFamilyId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -51,7 +52,7 @@ function FamilyHeaders() {
 
     const handleEdit = (id) => {
         // Handle edit logic here
-        console.log(`Edit family with ID: ${id}`);
+        navigator(`/admin-dashboard/edit-header/${id}`)
     };
 
     const handleDelete = (id) => {
@@ -217,6 +218,13 @@ function FamilyHeaders() {
                                             <td className="py-4 px-4 whitespace-nowrap text-gray-700">{family.familysize}</td>
                                             <td className="py-4 px-4 whitespace-nowrap">
                                                 <div className="flex space-x-2">
+                                                    <Link
+                                                        to={`/admin-dashboard/member-detail/${family.id}`}
+                                                        className="p-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-200"
+                                                        title="View Details"
+                                                    >
+                                                        <Info size={18} />
+                                                    </Link>
                                                     <button
                                                         onClick={() => handleEdit(family.id)}
                                                         className="p-1.5 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors duration-200"

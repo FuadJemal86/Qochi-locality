@@ -61,9 +61,7 @@ function FmailyMembers() {
     };
 
     const handleEdit = (id) => {
-        // Handle edit logic here
-        navigate(`/family-head-dashboard/edit-family-member/${id}`)
-        console.log(`Edit family with ID: ${id}`);
+        navigate(`/family-head-dashboard/family-members/${id}`)
     };
 
     const handleDelete = (id) => {
