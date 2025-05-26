@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Toaster, toast } from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import banner from '../../images/Qochi.avif'
 import api from '../../../api'
 
@@ -161,14 +161,14 @@ function Login() {
 
                         <div className="text-center mt-6">
                             <p className="text-xs text-gray-500">
-                                By signing in, you agree to our <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>
+                                By signing in, you agree to our <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="/" className="text-blue-600 hover:underline">Privacy Policy</a>
                             </p>
                         </div>
                     </div>
 
                     <div className="mt-8 text-center">
                         <p className="text-sm text-gray-600">
-                            Need help? <a href="#" className="font-medium text-blue-600 hover:text-blue-500">Contact Support</a>
+                            to home ? <Link to={'/'} className="font-medium text-blue-600 hover:text-blue-500">Home</Link>
                         </p>
                     </div>
                 </div>
