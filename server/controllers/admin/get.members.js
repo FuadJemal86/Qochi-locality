@@ -5,7 +5,14 @@ const getMembers = async (req, res) => {
     try {
 
         const familyMembers = await prisma.member.findMany({
-            where: { isRemoved: false }
+            where: { isRemoved: false },
+            include: {
+                head: {
+                    select: {
+                        fullName: true
+                    }
+                }
+            }
         })
 
         return res.status(200).json({ status: true, familyMembers })

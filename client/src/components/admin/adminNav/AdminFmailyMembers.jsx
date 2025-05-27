@@ -263,7 +263,7 @@ function AdminFamilyMembers() {
                                             <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.fullName || "No Name"}</td>
 
                                             {/* Header Name (Head of Family Name) */}
-                                            <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.headId || "No Family Head"}</td>
+                                            <td className="py-4 px-4 whitespace-nowrap font-medium text-gray-900">{member.head.fullName || "No Family Head"}</td>
 
                                             {/* Birth Date */}
                                             <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-500">
