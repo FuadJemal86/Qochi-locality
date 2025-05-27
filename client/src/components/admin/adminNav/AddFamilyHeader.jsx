@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
     User,
     Phone,
@@ -20,119 +20,162 @@ import api from '../../../../api';
 import Swal from 'sweetalert2';
 
 const AddFamilyHeader = () => {
-    // Form refs
-    const formRef = useRef(null);
-    const imageInputRef = useRef(null);
+    // Form data state - exact same structure as EditMember
+    const [formData, setFormData] = useState({
+        fullName: '',
+        contactInfo: '',
+        email: '',
+        password: '',
+        houseNumber: '',
+        familysize: '',
+        type: ''
+    });
 
-    // Basic states for UI management
+    // UI states - exact same as EditMember
     const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [image, setImage] = useState(null);
 
-    const validateForm = () => {
-        if (!formRef.current) return false;
+    // Handle input changes - EXACT same as EditMember
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
 
-        const form = formRef.current;
+        // Clear error when user starts typing
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: "" }));
+        }
+    };
+
+    // Validation - same structure as EditMember
+    const validateForm = () => {
         const newErrors = {};
 
-        // Get values from form
-        const fullName = form.fullName.value.trim();
-        const contactInfo = form.contactInfo.value.trim();
-        const email = form.email.value.trim();
-        const password = form.password.value;
-        const houseNumber = form.houseNumber.value.trim();
-        const familySize = form.familysize.value.trim();
-        const type = form.type.value;
+        if (!formData.fullName.trim()) {
+            newErrors.fullName = "Full name is required";
+        }
 
-        // Basic validation
-        if (!fullName) newErrors.fullName = "Full name is required";
-        if (!contactInfo) newErrors.contactInfo = "Contact information is required";
+        if (!formData.contactInfo.trim()) {
+            newErrors.contactInfo = "Contact information is required";
+        }
 
-        if (!email) {
+        if (!formData.email.trim()) {
             newErrors.email = "Email is required";
-        } else if (!/\S+@\S+\.\S+/.test(email)) {
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = "Email is invalid";
         }
 
-        if (!password) {
+        if (!formData.password) {
             newErrors.password = "Password is required";
-        } else if (password.length < 8) {
+        } else if (formData.password.length < 8) {
             newErrors.password = "Password must be at least 8 characters";
         }
 
-        if (!houseNumber) newErrors.houseNumber = "House number is required";
-        if (!familySize) newErrors.familySize = "Family size is required";
-        if (!type) newErrors.type = "Home type is required";
+        if (!formData.houseNumber.trim()) {
+            newErrors.houseNumber = "House number is required";
+        }
+
+        if (!formData.familysize.trim()) {
+            newErrors.familysize = "Family size is required";
+        }
+
+        if (!formData.type) {
+            newErrors.type = "Home type is required";
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
+    // Submit handler - EXACT same pattern as EditMember
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (validateForm()) {
-            setLoading(true);
+        if (!validateForm()) {
+            return;
+        }
 
-            const formData = new FormData(formRef.current);
+        setIsLoading(true);
+
+        try {
+            let result;
 
             if (image) {
-                formData.append('image', image);
-            }
+                // Use FormData only when image is present
+                const submitData = new FormData();
+                submitData.append('fullName', formData.fullName);
+                submitData.append('contactInfo', formData.contactInfo);
+                submitData.append('email', formData.email);
+                submitData.append('password', formData.password);
+                submitData.append('houseNumber', formData.houseNumber);
+                submitData.append('familysize', formData.familysize);
+                submitData.append('type', formData.type);
+                submitData.append('image', image);
 
-            try {
-                const response = await api.post('/admin/add-family-header', formData);
-
-                if (response.data.status) {
-                    setLoading(false);
-                    setSuccess(true);
-                    formRef.current.reset();
-                    setPreviewImage(null);
-                    setImage(null);
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Family Head Added!',
-                        text: 'The family head was successfully added.',
-                        timer: 3000,
-                        showConfirmButton: false
-                    });
-
-                    setTimeout(() => {
-                        setSuccess(false);
-                    }, 5000);
-                } else {
-                    setLoading(false);
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Failed',
-                        text: response.data.message
-                    });
-                }
-            } catch (error) {
-                console.error("Error submitting form:", error);
-                setLoading(false);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops!',
-                    text: error.response.data.message || 'Failed to add family head. Please try again.'
+                result = await api.post('/admin/add-family-header', submitData);
+            } else {
+                // Send JSON data when no image (like EditMember)
+                result = await api.post('/admin/add-family-header', {
+                    fullName: formData.fullName,
+                    contactInfo: formData.contactInfo,
+                    email: formData.email,
+                    password: formData.password,
+                    houseNumber: formData.houseNumber,
+                    familysize: formData.familysize,
+                    type: formData.type
                 });
             }
-        }
-    };
 
+            // Handle success
+            setSuccess(true);
 
-    // Clear error when input field is focused
-    const handleFocus = (name) => {
-        if (errors[name]) {
-            setErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[name];
-                return newErrors;
+            // Reset form
+            setFormData({
+                fullName: '',
+                contactInfo: '',
+                email: '',
+                password: '',
+                houseNumber: '',
+                familysize: '',
+                type: ''
             });
+            setPreviewImage(null);
+            setImage(null);
+            setErrors({});
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Family Head Added!',
+                text: 'The family head was successfully added.',
+                timer: 3000,
+                showConfirmButton: false
+            });
+
+            setTimeout(() => {
+                setSuccess(false);
+            }, 5000);
+
+            console.log("Family head added successfully:", result.data.message);
+
+        } catch (error) {
+            console.error("Error adding family head:", error);
+
+            // Handle specific error cases like EditMember
+            if (error.response) {
+                // Server responded with error status
+                const errorMessage = error.response.data?.message || "Failed to add family head";
+                setErrors({ submit: errorMessage });
+            } else if (error.request) {
+                // Request was made but no response received
+                setErrors({ submit: "Network error. Please check your connection." });
+            } else {
+                setErrors({ submit: "An unexpected error occurred" });
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -141,7 +184,7 @@ const AddFamilyHeader = () => {
         if (file) {
             // Check file size (max 2MB)
             if (file.size > 2 * 1024 * 1024) {
-                alert("Image must be smaller than 2MB");
+                setErrors(prev => ({ ...prev, image: "Image must be smaller than 2MB" }));
                 return;
             }
 
@@ -153,6 +196,11 @@ const AddFamilyHeader = () => {
                 setPreviewImage(reader.result);
             };
             reader.readAsDataURL(file);
+
+            // Clear any previous image errors
+            if (errors.image) {
+                setErrors(prev => ({ ...prev, image: "" }));
+            }
         }
     };
 
@@ -162,57 +210,34 @@ const AddFamilyHeader = () => {
         for (let i = 0; i < 12; i++) {
             password += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-        if (formRef.current) {
-            formRef.current.password.value = password;
-        }
+        setFormData(prev => ({
+            ...prev,
+            password: password
+        }));
     };
 
     const removeImage = () => {
         setImage(null);
         setPreviewImage(null);
-        if (imageInputRef.current) {
-            imageInputRef.current.value = '';
+        if (errors.image) {
+            setErrors(prev => ({ ...prev, image: "" }));
         }
     };
 
-    // Input Field component
-    const InputField = ({ name, label, type = "text", icon, placeholder, required = false }) => {
-        return (
-            <div className="mb-4">
-                <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-                    {label} {required && <span className="text-red-500">*</span>}
-                </label>
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                        {icon}
-                    </div>
-                    <input
-                        type={type === 'password' ? (showPassword ? 'text' : 'password') : type}
-                        id={name}
-                        name={name}
-                        onFocus={() => handleFocus(name)}
-                        className={`pl-10 ${name === 'password' ? 'pr-10' : ''} w-full rounded-lg border ${errors[name] ? 'border-red-300 ring-1 ring-red-500' : 'border-gray-200'
-                            } focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm p-2.5 text-gray-900 outline-none transition-all duration-200`}
-                        placeholder={placeholder}
-                    />
-                    {name === 'password' && (
-                        <button
-                            type="button"
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
-                            onClick={() => setShowPassword(!showPassword)}
-                            tabIndex="-1"
-                        >
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                    )}
-                </div>
-                {errors[name] && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center">
-                        <AlertCircle size={14} className="mr-1" /> {errors[name]}
-                    </p>
-                )}
-            </div>
-        );
+    const resetForm = () => {
+        setFormData({
+            fullName: '',
+            contactInfo: '',
+            email: '',
+            password: '',
+            houseNumber: '',
+            familysize: '',
+            type: ''
+        });
+        setPreviewImage(null);
+        setImage(null);
+        setErrors({});
+        setSuccess(false);
     };
 
     return (
@@ -237,170 +262,241 @@ const AddFamilyHeader = () => {
                         </div>
                     )}
 
-                    {/* Form */}
-                    <form ref={formRef} onSubmit={handleSubmit}>
-                        <div className="p-6">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                {/* Left Column - Personal Info */}
-                                <div className="md:col-span-2 space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <InputField
-                                            name="fullName"
-                                            label="Full Name"
-                                            icon={<User size={18} />}
-                                            placeholder="John Smith"
-                                            required
-                                        />
+                    {/* Error message for submission */}
+                    {errors.submit && (
+                        <div className="m-6 p-4 bg-red-50 rounded-lg border border-red-200">
+                            <p className="text-red-700 text-sm">{errors.submit}</p>
+                        </div>
+                    )}
 
-                                        <InputField
-                                            name="contactInfo"
-                                            label="Contact Number"
-                                            icon={<Phone size={18} />}
-                                            placeholder="+1 (555) 123-4567"
-                                            required
-                                        />
-                                    </div>
+                    {/* Form - EXACT same structure as EditMember */}
+                    <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                        {/* Basic Information - Same grid as EditMember */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                                    <User size={16} className="mr-1 text-blue-500" />
+                                    Full Name *
+                                </label>
+                                <input
+                                    type="text"
+                                    name="fullName"
+                                    value={formData.fullName}
+                                    onChange={handleChange}
+                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.fullName ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                                        }`}
+                                    placeholder="Enter full name"
+                                />
+                                {errors.fullName && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
+                                )}
+                            </div>
 
-                                    <InputField
-                                        name="email"
-                                        label="Email Address"
-                                        type="email"
-                                        icon={<Mail size={18} />}
-                                        placeholder="john.smith@example.com"
-                                        required
-                                    />
+                            <div>
+                                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                                    <Phone size={16} className="mr-1 text-blue-500" />
+                                    Contact Number *
+                                </label>
+                                <input
+                                    type="text"
+                                    name="contactInfo"
+                                    value={formData.contactInfo}
+                                    onChange={handleChange}
+                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.contactInfo ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                                        }`}
+                                    placeholder="+1 (555) 123-4567"
+                                />
+                                {errors.contactInfo && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.contactInfo}</p>
+                                )}
+                            </div>
+                        </div>
 
-                                    <div className="relative">
-                                        <InputField
-                                            name="password"
-                                            label="Password"
-                                            type="password"
-                                            icon={<Lock size={18} />}
-                                            placeholder="••••••••"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={generatePassword}
-                                            className="absolute right-0 top-7 -mt-1 mr-12 px-2 py-1 bg-gray-100 text-xs text-gray-700 rounded hover:bg-gray-200"
-                                            tabIndex="-1"
-                                        >
-                                            Generate
-                                        </button>
-                                    </div>
+                        <div>
+                            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                                <Mail size={16} className="mr-1 text-blue-500" />
+                                Email Address *
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                                    }`}
+                                placeholder="john.smith@example.com"
+                            />
+                            {errors.email && (
+                                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                            )}
+                        </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <InputField
-                                            name="houseNumber"
-                                            label="House Number"
-                                            icon={<Home size={18} />}
-                                            placeholder="123"
-                                            required
-                                        />
+                        <div className="relative">
+                            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                                <Lock size={16} className="mr-1 text-blue-500" />
+                                Password *
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    className={`w-full px-4 py-3 pr-20 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                                        }`}
+                                    placeholder="••••••••"
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute inset-y-0 right-12 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={generatePassword}
+                                    className="absolute right-1 top-1 bottom-1 px-2 py-1 bg-gray-100 text-xs text-gray-700 rounded hover:bg-gray-200"
+                                >
+                                    Generate
+                                </button>
+                            </div>
+                            {errors.password && (
+                                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                            )}
+                        </div>
 
-                                        <InputField
-                                            name="familysize"
-                                            label="Family Size"
-                                            icon={<Users size={18} />}
-                                            placeholder="4"
-                                            required
-                                        />
-                                    </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                                    <Home size={16} className="mr-1 text-blue-500" />
+                                    House Number *
+                                </label>
+                                <input
+                                    type="text"
+                                    name="houseNumber"
+                                    value={formData.houseNumber}
+                                    onChange={handleChange}
+                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.houseNumber ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                                        }`}
+                                    placeholder="123"
+                                />
+                                {errors.houseNumber && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.houseNumber}</p>
+                                )}
+                            </div>
 
-                                    {/* Home Type Select Field */}
-                                    <div className="mb-4">
-                                        <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
-                                            Home Type <span className="text-red-500">*</span>
-                                        </label>
-                                        <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                                <Building size={18} />
-                                            </div>
-                                            <select
-                                                id="type"
-                                                name="type"
-                                                onFocus={() => handleFocus("type")}
-                                                className={`pl-10 w-full rounded-lg border ${errors.type ? 'border-red-300 ring-1 ring-red-500' : 'border-gray-200'
-                                                    } shadow-sm p-2.5`}
+                            <div>
+                                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                                    <Users size={16} className="mr-1 text-blue-500" />
+                                    Family Size *
+                                </label>
+                                <input
+                                    type="text"
+                                    name="familysize"
+                                    value={formData.familysize}
+                                    onChange={handleChange}
+                                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${errors.familysize ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                                        }`}
+                                    placeholder="4"
+                                />
+                                {errors.familysize && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.familysize}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                                <Building size={16} className="mr-1 text-blue-500" />
+                                Home Type *
+                            </label>
+                            <select
+                                name="type"
+                                value={formData.type}
+                                onChange={handleChange}
+                                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none bg-white ${errors.type ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                                    }`}
+                            >
+                                <option value="">Select Home Type</option>
+                                <option value="Private">Private</option>
+                                <option value="Rental">Rental</option>
+                                <option value="PublicHousing">Public Housing</option>
+                            </select>
+                            {errors.type && (
+                                <p className="mt-1 text-sm text-red-600">{errors.type}</p>
+                            )}
+                        </div>
+
+                        {/* Profile Image Upload */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Profile Image
+                            </label>
+                            <div className="flex items-center space-x-6">
+                                <div className="w-24 h-24 bg-gray-100 rounded-full overflow-hidden border border-gray-200 relative group">
+                                    {previewImage ? (
+                                        <>
+                                            <img src={previewImage} alt="Preview" className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={removeImage}
+                                                className="absolute top-1 right-1 bg-white rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
                                             >
-                                                <option value="">Select Home Type</option>
-                                                <option value="Private">Private</option>
-                                                <option value="Rental">Rental</option>
-                                                <option value="PublicHousing">Public Housing</option>
-                                            </select>
+                                                <X size={12} className="text-gray-600" />
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <div className="h-full flex items-center justify-center text-gray-400">
+                                            <User size={32} />
                                         </div>
-                                        {errors.type && (
-                                            <p className="mt-1 text-sm text-red-600 flex items-center">
-                                                <AlertCircle size={14} className="mr-1" /> {errors.type}
-                                            </p>
-                                        )}
-                                    </div>
+                                    )}
                                 </div>
-
-                                {/* Right Column - Profile Image */}
-                                <div className="md:col-span-1">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Profile Image
+                                <div>
+                                    <label className="cursor-pointer bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md text-sm flex items-center transition duration-200">
+                                        <Upload size={16} className="mr-2" /> Upload Photo
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            className="hidden"
+                                        />
                                     </label>
-                                    <div className="flex flex-col items-center">
-                                        <div className="w-32 h-32 bg-gray-100 rounded-full overflow-hidden border border-gray-200 mb-3 relative group">
-                                            {previewImage ? (
-                                                <>
-                                                    <img src={previewImage} alt="Preview" className="w-full h-full object-cover" />
-                                                    <button
-                                                        type="button"
-                                                        onClick={removeImage}
-                                                        className="absolute top-1 right-1 bg-white rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    >
-                                                        <X size={16} className="text-gray-600" />
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <div className="h-full flex items-center justify-center text-gray-400">
-                                                    <User size={48} />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <label className="cursor-pointer bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-3 py-2 rounded-md text-sm flex items-center transition duration-200">
-                                            <Upload size={16} className="mr-2" /> Upload Photo
-                                            <input
-                                                ref={imageInputRef}
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleImageChange}
-                                                className="hidden"
-                                            />
-                                        </label>
-                                        <p className="text-xs text-gray-500 mt-2 text-center">
-                                            JPG, PNG or GIF, Max 2MB
-                                        </p>
-                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        JPG, PNG or GIF, Max 2MB
+                                    </p>
+                                    {errors.image && (
+                                        <p className="mt-1 text-sm text-red-600">{errors.image}</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
 
-                        {/* Form Actions */}
-                        <div className="bg-gray-50 px-6 py-4 flex items-center justify-end space-x-3 border-t border-gray-200">
+                        {/* Action Buttons - Same as EditMember */}
+                        <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
                             <button
                                 type="button"
-                                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                                onClick={resetForm}
+                                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center"
                             >
+                                <X size={18} className="mr-1" />
                                 Cancel
                             </button>
+
                             <button
                                 type="submit"
-                                disabled={loading}
-                                className={`px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 flex items-center ${loading ? "opacity-70 cursor-wait" : ""
+                                disabled={isLoading}
+                                className={`px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 flex items-center ${isLoading ? 'opacity-50 cursor-not-allowed' : ''
                                     }`}
                             >
-                                {loading ? (
+                                {isLoading ? (
                                     <>
-                                        <Loader2 size={16} className="animate-spin mr-2" />
-                                        Saving...
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                        Adding...
                                     </>
                                 ) : (
                                     <>
-                                        <Save size={16} className="mr-2" />
+                                        <Save size={18} className="mr-1" />
                                         Save Family Head
                                     </>
                                 )}
